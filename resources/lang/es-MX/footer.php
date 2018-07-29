@@ -3,7 +3,7 @@
 return [
 
     'version'               => 'Versión',
-    'powered'               => 'Powered By Akaunting',
-    'software'              => 'Software de Contabilidad Libre',
+    'powered'               => 'Powered By Nova',
+    'software'              => 'Software de Contabilidad',
 
 ];

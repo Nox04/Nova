@@ -18,7 +18,7 @@
             <!-- /.login-box-body -->
 
             <div class="login-box-footer">
-                {{ trans('footer.powered') }}: <a href="https://akaunting.com" target="_blank">{{ trans('footer.software') }}</a>
+                {{ trans('footer.powered') }}: <a href="https://nova.nox.kim" target="_blank">{{ trans('footer.software') }}</a>
             </div>
             <!-- /.login-box-footer -->
         </div>

@@ -3,7 +3,7 @@
 return [
 
     'version'               => 'Versie',
-    'powered'               => 'Powered By Akaunting',
+    'powered'               => 'Powered By Nova',
     'software'              => 'Gratis boekhoudsoftware',
 
 ];

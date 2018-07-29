@@ -3,7 +3,7 @@
 return [
 
     'version'               => 'Έκδοση',
-    'powered'               => 'Powered By Akaunting',
+    'powered'               => 'Powered By Nova',
     'software'              => 'Δωρεάν λογισμικό λογιστικής',
 
 ];
