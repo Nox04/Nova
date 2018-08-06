@@ -26,7 +26,7 @@ class Roles extends Seeder
     private function roles()
     {
         $rows = [
-            'admin' => [
+            'administrador' => [
                 'admin-panel' => 'r',
                 'api' => 'r',
                 'auth-users' => 'c,r,u,d',
@@ -64,7 +64,7 @@ class Roles extends Seeder
                 'reports-profit-loss' => 'r',
                 'reports-tax-summary' => 'r',
             ],
-            'manager' => [
+            'gerente' => [
                 'admin-panel' => 'r',
                 'auth-profile' => 'r,u',
                 'common-companies' => 'c,r,u,d',
@@ -83,8 +83,6 @@ class Roles extends Seeder
                 'settings-categories' => 'c,r,u,d',
                 'settings-taxes' => 'c,r,u,d',
                 'settings-currencies' => 'c,r,u,d',
-                'settings-modules' => 'r,u',
-                'install-updates' => 'r,u',
                 'notifications' => 'r,u',
                 'reports-income-summary' => 'r',
                 'reports-expense-summary' => 'r',
@@ -92,7 +90,7 @@ class Roles extends Seeder
                 'reports-profit-loss' => 'r',
                 'reports-tax-summary' => 'r',
             ],
-            'customer' => [
+            'cliente' => [
                 'customer-panel' => 'r',
                 'customers-invoices' => 'r,u',
                 'customers-payments' => 'r,u',

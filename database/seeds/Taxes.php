@@ -36,14 +36,8 @@ class Taxes extends Seeder
             ],
             [
                 'company_id' => $company_id,
-                'name' => trans('demo.taxes_normal'),
-                'rate' => '5',
-                'enabled' => '1'
-            ],
-            [
-                'company_id' => $company_id,
                 'name' => trans('demo.taxes_sales'),
-                'rate' => '15',
+                'rate' => '19',
                 'enabled' => '1'
             ],
         ];

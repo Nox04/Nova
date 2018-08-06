@@ -29,10 +29,10 @@ class Settings extends Seeder
         Setting::set([
             'general.date_format'               => 'd M Y',
             'general.date_separator'            => 'space',
-            'general.timezone'                  => 'Europe/London',
+            'general.timezone'                  => 'America/Bogota',
             'general.percent_position'          => 'after',
-            'general.invoice_number_prefix'     => 'INV-',
-            'general.invoice_number_digit'      => '5',
+            'general.invoice_number_prefix'     => 'FAC-',
+            'general.invoice_number_digit'      => '6',
             'general.invoice_number_next'       => '1',
             'general.default_payment_method'    => 'offlinepayment.cash.1',
             'general.email_protocol'            => 'mail',
@@ -45,11 +45,11 @@ class Settings extends Seeder
             'general.admin_theme'               => 'skin-green-light',
             'general.list_limit'                => '25',
             'general.use_gravatar'              => '0',
-            'general.session_handler'           => 'file',
+            'general.session_handler'           => 'database',
             'general.session_lifetime'          => '30',
             'general.file_size'                 => '2',
             'general.file_types'                => 'pdf,jpeg,jpg,png',
-            'offlinepayment.methods'           => '[{"code":"offlinepayment.cash.1","name":"Cash","order":"1","description":null},{"code":"offlinepayment.bank_transfer.2","name":"Bank Transfer","order":"2","description":null}]',
+            'offlinepayment.methods'           => '[{"code":"offlinepayment.cash.1","name":"Efectivo","order":"1","description":null},{"code":"offlinepayment.bank_transfer.2","name":"Transferencia bancaria","order":"2","description":null}]',
         ]);
     }
 }

@@ -34,7 +34,7 @@ class TestCompany extends Seeder
         $rows = [
             [
                 'id' => '1',
-                'domain' => 'test.com',
+                'domain' => 'nova.nox.kim',
             ],
         ];
 
@@ -43,10 +43,10 @@ class TestCompany extends Seeder
         }
 
         Setting::setExtraColumns(['company_id' => '1']);
-        Setting::set('general.company_name', 'Test Inc.');
-        Setting::set('general.company_email', 'info@test.com');
-        Setting::set('general.company_address', 'New Street 1254');
-        Setting::set('general.default_currency', 'USD');
+        Setting::set('general.company_name', 'Nova');
+        Setting::set('general.company_email', 'juan.angarita.11@gmail.com');
+        Setting::set('general.company_address', 'Calle 6 BIS # 23 - 44');
+        Setting::set('general.default_currency', 'COP');
         Setting::set('general.default_account', '1');
         Setting::set('general.default_payment_method', 'offlinepayment.cash.1');
         Setting::save();
@@ -58,9 +58,9 @@ class TestCompany extends Seeder
     {
         // Create user
         $user = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@akaunting.com',
-            'password' => '123456',
+            'name' => 'Nox',
+            'email' => 'juan.angarita.11@gmail.com',
+            'password' => '678Tppydk732dq4*',
             'last_logged_in_at' => Date::now(),
         ]);
 
