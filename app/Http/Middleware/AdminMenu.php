@@ -164,7 +164,7 @@ class AdminMenu
                     }
 
                     // Modules
-                    $modules = Module::all();
+                    /*$modules = Module::all();
                     $position = 5;
                     foreach ($modules as $module) {
                         if (!$module->status) {
@@ -181,7 +181,7 @@ class AdminMenu
                         $sub->url('settings/apps/' . $module->alias, title_case(str_replace('_', ' ', snake_case($m->getName()))), $position, $attr);
 
                         $position++;
-                    }
+                    }*/
                 }, 7, [
                     'title' => trans_choice('general.settings', 2),
                     'icon' => 'fa fa-gears',
@@ -189,14 +189,14 @@ class AdminMenu
             }
 
             // Apps
-            if ($user->can('read-modules-home')) {
+            /*if ($user->can('read-modules-home')) {
                 $menu->add([
                     'url' => 'apps/home',
                     'title' => trans_choice('general.modules', 2),
                     'icon' => 'fa fa-rocket',
                     'order' => 8,
                 ]);
-            }
+            }*/
 
             // Fire the event to extend the menu
             event(new AdminMenuCreated($menu));
