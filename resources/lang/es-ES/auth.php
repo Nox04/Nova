@@ -15,7 +15,7 @@ return [
     'never'                 => 'nunca',
     
     'password' => [
-        'current'           => 'Actual',
+        'current'           => 'Contraseña actual',
         'current_confirm'   => 'Confirmar contraseña',
         'new'               => 'Nueva contraseña',
         'new_confirm'       => 'Confirmar contraseña',
