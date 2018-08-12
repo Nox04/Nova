@@ -4,7 +4,7 @@ return [
 
     'profile'               => 'Perfil',
     'logout'                => 'Salir',
-    'login'                 => 'Iniciar sesión',
+    'login'                 => 'Ingresar',
     'login_to'              => 'Inicia sesión para empezar',
     'remember_me'           => 'Recordarme',
     'forgot_password'       => 'Olvidé mi contraseña',

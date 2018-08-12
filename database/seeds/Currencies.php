@@ -33,6 +33,7 @@ class Currencies extends Seeder
                 'name' => trans('demo.currencies_cop'),
                 'code' => 'COP',
                 'rate' => '1.00',
+                
                 'precision' => config('money.COP.precision'),
                 'symbol' => config('money.COP.symbol'),
                 'symbol_first' => config('money.COP.symbol_first'),
