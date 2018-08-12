@@ -30,7 +30,6 @@ class Version109 extends Listener
 
         foreach ($companies as $company) {
             Artisan::call('module:install', ['alias' => 'offlinepayment', 'company_id' => $company->id]);
-            Artisan::call('module:install', ['alias' => 'paypalstandard', 'company_id' => $company->id]);
         }
     }
 }
