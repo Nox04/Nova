@@ -159,7 +159,7 @@ class Settings extends Controller
 
     protected function oneCompany($key, $value)
     {
-        switch ($key) {
+        /*switch ($key) {
             case 'default_locale':
                 // Change default locale
                 Installer::updateEnv([
@@ -172,6 +172,6 @@ class Settings extends Controller
                     'SESSION_DRIVER' => $value
                 ]);
                 break;
-        }
+        }*/
     }
 }
