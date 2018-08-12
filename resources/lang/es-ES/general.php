@@ -64,7 +64,7 @@ return [
     'delete_confirm'        => 'Confirma el borrado de :name :type?',
     'name'                  => 'Nombre',
     'email'                 => 'Correo electrónico',
-    'tax_number'            => 'NIT',
+    'tax_number'            => 'CIF/NIF',
     'phone'                 => 'Teléfono',
     'address'               => 'Dirección',
     'website'               => 'Página web',
