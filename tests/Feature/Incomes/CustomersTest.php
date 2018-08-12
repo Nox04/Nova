@@ -107,7 +107,7 @@ class CustomersTest extends FeatureTestCase
 			'tax_number' => $this->faker->buildingNumber,
 			'phone' => $this->faker->phoneNumber,
 			'address' => $this->faker->streetAddress,
-			'website' => 'www.akaunting.com',
+			'website' => 'nova.nox.kim',
 			'currency_code' => $this->company->currencies()->first()->code,
 			'enabled' => $this->faker->boolean ? 1 : 0
 		];
