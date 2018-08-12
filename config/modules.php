@@ -135,10 +135,10 @@ return [
     |
     */
     'composer' => [
-        'vendor' => 'akaunting',
+        'vendor' => 'nova',
         'author' => [
-            'name' => 'Akaunting',
-            'email' => 'info@akaunting.com',
+            'name' => 'Nova',
+            'email' => 'info@nova.com',
         ],
     ],
 
