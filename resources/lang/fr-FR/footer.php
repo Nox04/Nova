@@ -3,8 +3,8 @@
 return [
 
     'version'               => 'Version',
-    'powered'               => 'Propulsé par Akaunting',
-    'link'                  => 'https://akaunting.com',
+    'powered'               => 'Propulsé par Nova',
+    'link'                  => 'https://nova.nox.kim',
     'software'              => 'Logiciel de comptabilité gratuit',
 
 ];
