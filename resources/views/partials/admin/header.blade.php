@@ -5,14 +5,14 @@
     <a href="{{ url('/') }}" class="logo">
         @if (setting('general.admin_theme', 'skin-green-light') == 'skin-green-light')
             <!-- mini logo for sidebar mini 50x50 pixels -->
-            <span class="logo-mini"><img src="{{ asset('public/img/akaunting-logo-white.png') }}" class="logo-image-mini" width="25" alt="Akaunting Logo"></span>
+            <span class="logo-mini"><img src="{{ asset('public/img/akaunting-logo-white.png') }}" class="logo-image-mini" width="25" alt="Nova Logo"></span>
             <!-- logo for regular state and mobile devices -->
-            <span class="logo-lg"><img src="{{ asset('public/img/akaunting-logo-white.png') }}" class="logo-image-lg" width="25" alt="Akaunting Logo"> <b>Akaunting</b></span>
+            <span class="logo-lg"><img src="{{ asset('public/img/akaunting-logo-white.png') }}" class="logo-image-lg" width="25" alt="Nova Logo"> <b>Nova</b></span>
         @else
             <!-- mini logo for sidebar mini 50x50 pixels -->
-            <span class="logo-mini"><img src="{{ asset('public/img/akaunting-logo-green.png') }}" class="logo-image-mini" width="25" alt="Akaunting Logo"></span>
+            <span class="logo-mini"><img src="{{ asset('public/img/akaunting-logo-green.png') }}" class="logo-image-mini" width="25" alt="Nova Logo"></span>
             <!-- logo for regular state and mobile devices -->
-            <span class="logo-lg"><img src="{{ asset('public/img/akaunting-logo-green.png') }}" class="logo-image-lg" width="25" alt="Akaunting Logo"> <b>Akaunting</b></span>
+            <span class="logo-lg"><img src="{{ asset('public/img/akaunting-logo-green.png') }}" class="logo-image-lg" width="25" alt="Nova Logo"> <b>Nova</b></span>
         @endif
     </a>
     <!-- Header Navbar: style can be found in header.less -->
@@ -156,17 +156,6 @@
                         </li>
                     </ul>
                 </li>
-                @permission('read-install-updates')
-                <!-- Updates: style can be found in dropdown.less -->
-                <li>
-                    <a href="{{ url('install/updates') }}" data-toggle="tooltip" data-placement="bottom" title="{{ $updates }} Updates Available">
-                        <i class="fa fa-refresh"></i>
-                        @if ($updates)
-                        <span class="label label-danger">{{ $updates }}</span>
-                        @endif
-                    </a>
-                </li>
-                @endpermission
                 <!-- Updates: style can be found in dropdown.less -->
                 <li class="hidden-xs">
                     <a href="{{ url(trans('header.docs_link')) }}" target="_blank" title="{{ trans('general.help') }}">
