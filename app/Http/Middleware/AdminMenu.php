@@ -168,37 +168,27 @@ class AdminMenu
                     }
 
                     // Modules
-                    $modules = Module::all();
-                    $position = 5;
-                    foreach ($modules as $module) {
-                        if (!$module->status) {
-                            continue;
-                        }
+                    // $modules = Module::all();
+                    // $position = 5;
+                    // foreach ($modules as $module) {
+                    //     if (!$module->status) {
+                    //         continue;
+                    //     }
 
-                        $m = LaravelModule::findByAlias($module->alias);
+                    //     $m = LaravelModule::findByAlias($module->alias);
 
-                        // Check if the module exists and has settings
-                        if (!$m || empty($m->get('settings'))) {
-                            continue;
-                        }
+                    //     // Check if the module exists and has settings
+                    //     if (!$m || empty($m->get('settings'))) {
+                    //         continue;
+                    //     }
 
-                        $sub->url('settings/apps/' . $module->alias, title_case(str_replace('_', ' ', snake_case($m->getName()))), $position, $attr);
+                    //     $sub->url('settings/apps/' . $module->alias, title_case(str_replace('_', ' ', snake_case($m->getName()))), $position, $attr);
 
-                        $position++;
-                    }
+                    //     $position++;
+                    // }
                 }, 7, [
                     'title' => trans_choice('general.settings', 2),
                     'icon' => 'fa fa-gears',
-                ]);
-            }
-
-            // Apps
-            if ($user->can('read-modules-home')) {
-                $menu->add([
-                    'url' => 'apps/home',
-                    'title' => trans_choice('general.modules', 2),
-                    'icon' => 'fa fa-rocket',
-                    'order' => 8,
                 ]);
             }
 
