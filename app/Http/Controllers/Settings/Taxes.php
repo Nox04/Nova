@@ -18,7 +18,13 @@ class Taxes extends Controller
     {
         $taxes = Tax::collect();
 
-        return view('settings.taxes.index', compact('taxes', 'rates'));
+        $types = [
+            'normal' => trans('taxes.normal'),
+            'inclusive' => trans('taxes.inclusive'),
+            'compound' => trans('taxes.compound'),
+        ];
+
+        return view('settings.taxes.index', compact('taxes', 'types'));
     }
 
     /**
@@ -38,7 +44,13 @@ class Taxes extends Controller
      */
     public function create()
     {
-        return view('settings.taxes.create');
+        $types = [
+            'normal' => trans('taxes.normal'),
+            'inclusive' => trans('taxes.inclusive'),
+            'compound' => trans('taxes.compound'),
+        ];
+
+        return view('settings.taxes.create', compact('types'));
     }
 
     /**
@@ -68,7 +80,13 @@ class Taxes extends Controller
      */
     public function edit(Tax $tax)
     {
-        return view('settings.taxes.edit', compact('tax'));
+        $types = [
+            'normal' => trans('taxes.normal'),
+            'inclusive' => trans('taxes.inclusive'),
+            'compound' => trans('taxes.compound'),
+        ];
+
+        return view('settings.taxes.edit', compact('tax', 'types'));
     }
 
     /**
@@ -149,8 +167,6 @@ class Taxes extends Controller
             $message = trans('messages.warning.disabled', ['name' => $tax->name, 'text' => implode(', ', $relationships)]);
 
             flash($message)->warning();
-
-            return redirect()->route('taxes.index');
         }
 
         return redirect()->route('taxes.index');

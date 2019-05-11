@@ -17,7 +17,7 @@ class BillItem extends Model
      *
      * @var array
      */
-    protected $fillable = ['company_id', 'bill_id', 'item_id', 'name', 'sku', 'quantity', 'price', 'total', 'tax', 'tax_id'];
+    protected $fillable = ['company_id', 'bill_id', 'item_id', 'name', 'sku', 'quantity', 'price', 'total', 'tax'];
 
     public function bill()
     {
@@ -29,9 +29,9 @@ class BillItem extends Model
         return $this->belongsTo('App\Models\Common\Item');
     }
 
-    public function tax()
+    public function taxes()
     {
-        return $this->belongsTo('App\Models\Setting\Tax');
+        return $this->hasMany('App\Models\Expense\BillItemTax', 'bill_item_id', 'id');
     }
 
     /**
@@ -42,7 +42,7 @@ class BillItem extends Model
      */
     public function setPriceAttribute($value)
     {
-        $this->attributes['price'] = (double) money($value, $this->bill->currency_code)->getAmount();
+        $this->attributes['price'] = (double) $value;
     }
 
     /**
@@ -53,7 +53,7 @@ class BillItem extends Model
      */
     public function setTotalAttribute($value)
     {
-        $this->attributes['total'] = (double) money($value, $this->bill->currency_code)->getAmount();
+        $this->attributes['total'] = (double) $value;
     }
 
     /**
@@ -64,6 +64,6 @@ class BillItem extends Model
      */
     public function setTaxAttribute($value)
     {
-        $this->attributes['tax'] = (double) money($value, $this->bill->currency_code)->getAmount();
+        $this->attributes['tax'] = (double) $value;
     }
 }

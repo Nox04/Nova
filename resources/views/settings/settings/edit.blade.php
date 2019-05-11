@@ -8,9 +8,9 @@
         {!! Form::model($setting, [
             'method' => 'PATCH',
             'url' => ['settings/settings'],
-            'class' => 'setting-form',
+            'class' => 'setting-form form-loading-button',
             'files' => true,
-            'role' => 'form'
+            'role' => 'form',
         ]) !!}
 
         <div class="col-sm-12">
@@ -39,14 +39,18 @@
                         {{ Form::textareaGroup('company_address', trans('settings.company.address')) }}
 
                         {{ Form::fileGroup('company_logo', trans('settings.company.logo')) }}
+
+                        {!! Form::hidden('wizard', null, ['id' => 'wizard']) !!}
                     </div>
 
                     <div class="tab-pane tab-margin" id="localisation">
+                        {{ Form::textGroup('financial_start', trans('settings.localisation.financial_start'), 'calendar-check-o', ['id' => 'financial_start', 'class' => 'form-control', 'data-inputmask' => '\'alias\': \'dd-mm\'', 'data-mask' => '', 'autocomplete' => 'off'], $setting['financial_start']) }}
+
+                        {{ Form::selectGroup('timezone', trans('settings.localisation.timezone'), 'globe', $timezones, null, []) }}
+
                         {{ Form::selectGroup('date_format', trans('settings.localisation.date.format'), 'calendar', $date_formats, null, ['autocomplete' => 'off']) }}
 
                         {{ Form::selectGroup('date_separator', trans('settings.localisation.date.separator'), 'minus', $date_separators, null, []) }}
-
-                        {{ Form::selectGroup('timezone', trans('settings.localisation.timezone'), 'globe', $timezones, null, []) }}
 
                         {{ Form::selectGroup('percent_position', trans('settings.localisation.percent.title'), 'percent', $percent_positions, null, []) }}
                     </div>
@@ -57,6 +61,12 @@
                         {{ Form::textGroup('invoice_number_digit', trans('settings.invoice.digit'), 'text-width', []) }}
 
                         {{ Form::textGroup('invoice_number_next', trans('settings.invoice.next'), 'chevron-right', []) }}
+
+                        {{ Form::invoice_text('invoice_item', trans('settings.invoice.item_name'), 'font', $item_names, null, [], 'invoice_item_input', null) }}
+
+                        {{ Form::invoice_text('invoice_price', trans('settings.invoice.price_name'), 'font', $price_names, null, [], 'invoice_price_input', null) }}
+
+                        {{ Form::invoice_text('invoice_quantity', trans('settings.invoice.quantity_name'), 'font', $quantity_names, null, [], 'invoice_quantity_input', null) }}
 
                         {{ Form::fileGroup('invoice_logo', trans('settings.invoice.logo')) }}
                     </div>
@@ -84,7 +94,7 @@
 
                         {{ Form::textGroup('email_smtp_username', trans('settings.email.smtp.username'), 'paper-plane-o', []) }}
 
-                        {{ Form::passwordGroup('email_smtp_password', trans('settings.email.smtp.password'), 'paper-plane-o', []) }}
+                        {{ Form::textGroup('email_smtp_password', trans('settings.email.smtp.password'), 'paper-plane-o', ['type' => 'password']) }}
 
                         {{ Form::selectGroup('email_smtp_encryption', trans('settings.email.smtp.encryption'), 'paper-plane-o', ['' => trans('settings.email.smtp.none'), 'ssl' => 'SSL', 'tls' => 'TLS'], null, []) }}
                     </div>
@@ -97,6 +107,10 @@
                         {{ Form::radioGroup('send_bill_reminder', trans('settings.scheduling.send_bill')) }}
 
                         {{ Form::textGroup('schedule_bill_days', trans('settings.scheduling.bill_days'), 'calendar-check-o', []) }}
+
+                        {{ Form::radioGroup('send_item_reminder', trans('settings.scheduling.send_item_reminder')) }}
+
+                        {{ Form::textGroup('schedule_item_stocks', trans('settings.scheduling.item_stocks'), 'cubes', []) }}
 
                         <div class="col-sm-6">
                             <label for="cron_command" class="control-label">{{ trans('settings.scheduling.cron_command') }}</label>
@@ -127,7 +141,7 @@
                     @permission('update-settings-settings')
                     <div class="setting-buttons">
                         <div class="form-group no-margin">
-                            {!! Form::button('<span class="fa fa-save"></span> &nbsp;' . trans('general.save'), ['type' => 'submit', 'class' => 'btn btn-success']) !!}
+                            {!! Form::button('<span class="fa fa-save"></span> &nbsp;' . trans('general.save'), ['type' => 'submit', 'class' => 'btn btn-success  button-submit', 'data-loading-text' => trans('general.loading')]) !!}
                             <a href="{{ URL::previous() }}" class="btn btn-default"><span class="fa fa-times-circle"></span> &nbsp;{{ trans('general.cancel') }}</a>
                         </div>
                     </div>
@@ -141,10 +155,15 @@
 @endsection
 
 @push('js')
+    <script src="{{ asset('vendor/almasaeed2010/adminlte/plugins/datepicker/bootstrap-datepicker.js') }}"></script>
+    @if (language()->getShortCode() != 'en')
+    <script src="{{ asset('vendor/almasaeed2010/adminlte/plugins/datepicker/locales/bootstrap-datepicker.' . language()->getShortCode() . '.js') }}"></script>
+    @endif
     <script src="{{ asset('public/js/bootstrap-fancyfile.js') }}"></script>
 @endpush
 
 @push('css')
+    <link rel="stylesheet" href="{{ asset('vendor/almasaeed2010/adminlte/plugins/datepicker/datepicker3.css') }}">
     <link rel="stylesheet" href="{{ asset('public/css/bootstrap-fancyfile.css') }}">
 @endpush
 
@@ -154,6 +173,8 @@
         var text_no = '{{ trans('general.no') }}';
 
         $(document).ready(function() {
+            $('#email_smtp_password').attr('type', 'password');
+
             $("#date_format").select2({
                 placeholder: "{{ trans('general.form.select.field', ['field' => trans('settings.localisation.date.format')]) }}"
             });
@@ -206,73 +227,84 @@
                 placeholder: "{{ trans('general.form.select.field', ['field' => trans('settings.system.session.handler')]) }}"
             });
 
+            $('#financial_start').datepicker({
+                format: 'dd-mm',
+                todayBtn: 'linked',
+                weekStart: 1,
+                autoclose: true,
+                language: '{{ language()->getShortCode() }}'
+            });
+
             $('#company_logo').fancyfile({
                 text  : '{{ trans('general.form.select.file') }}',
                 style : 'btn-default',
                 @if($setting['company_logo'])
-                placeholder : '<?php echo $setting['company_logo']->basename; ?>'
+                placeholder : '{{ $setting['company_logo']->basename }}',
                 @else
-                placeholder : '{{ trans('general.form.no_file_selected') }}'
+                placeholder : '{{ trans('general.form.no_file_selected') }}',
                 @endif
             });
 
             @if($setting['company_logo'])
-                company_logo_html  = '<span class="company_logo">';
-                company_logo_html += '    <a href="{{ url('uploads/' . $setting['company_logo']->id . '/download') }}">';
-                company_logo_html += '        <span id="download-company_logo" class="text-primary">';
-                company_logo_html += '            <i class="fa fa-file-{{ $setting['company_logo']->aggregate_type }}-o"></i> {{ $setting['company_logo']->basename }}';
-                company_logo_html += '        </span>';
-                company_logo_html += '    </a>';
-                company_logo_html += '    {!! Form::open(['id' => 'company_logo-' . $setting['company_logo']->id, 'method' => 'DELETE', 'url' => [url('uploads/' . $setting['company_logo']->id)], 'style' => 'display:inline']) !!}';
-                company_logo_html += '    <a id="remove-company_logo" href="javascript:void();">';
-                company_logo_html += '        <span class="text-danger"><i class="fa fa fa-times"></i></span>';
-                company_logo_html += '    </a>';
-                company_logo_html += '    <input type="hidden" name="page" value="setting" />';
-                company_logo_html += '    <input type="hidden" name="key" value="general.company_logo" />';
-                company_logo_html += '    <input type="hidden" name="value" value="{{ $setting['company_logo']->id }}" />';
-                company_logo_html += '    {!! Form::close() !!}';
-                company_logo_html += '</span>';
-    
-                $('#company .fancy-file .fake-file').append(company_logo_html);
-    
-                $(document).on('click', '#remove-company_logo', function (e) {
-                    confirmDelete("#company_logo-{!! $setting['company_logo']->id !!}", "{!! trans('general.attachment') !!}", "{!! trans('general.delete_confirm', ['name' => '<strong>' . $setting['company_logo']->basename . '</strong>', 'type' => strtolower(trans('general.attachment'))]) !!}", "{!! trans('general.cancel') !!}", "{!! trans('general.delete')  !!}");
-                });
-            @endif
-
-            $('#invoice_logo').fancyfile({
-                text  : '{{ trans('general.form.select.file') }}',
-                style : 'btn-default',
-                @if($setting['invoice_logo'])
-                placeholder : '<?php echo $setting['invoice_logo']->basename; ?>'
-                @else
-                placeholder : '{{ trans('general.form.no_file_selected') }}'
-                @endif
+            $.ajax({
+                url: '{{ url('uploads/' . $setting['company_logo']->id . '/show') }}',
+                type: 'GET',
+                data: {column_name: 'company_logo', page: 'setting', key: 'general.company_logo'},
+                dataType: 'JSON',
+                success: function(json) {
+                    if (json['success']) {
+                        $('#company .fancy-file').after(json['html']);
+                    }
+                }
             });
 
-            @if($setting['invoice_logo'])
-                invoice_logo_html  = '<span class="invoice_logo">';
-                invoice_logo_html += '    <a href="{{ url('uploads/' . $setting['invoice_logo']->id . '/download') }}">';
-                invoice_logo_html += '        <span id="download-invoice_logo" class="text-primary">';
-                invoice_logo_html += '            <i class="fa fa-file-{{ $setting['invoice_logo']->aggregate_type }}-o"></i> {{ $setting['invoice_logo']->basename }}';
-                invoice_logo_html += '        </span>';
-                invoice_logo_html += '    </a>';
-                invoice_logo_html += '    {!! Form::open(['id' => 'invoice_logo-' . $setting['invoice_logo']->id, 'method' => 'DELETE', 'url' => [url('uploads/' . $setting['invoice_logo']->id)], 'style' => 'display:inline']) !!}';
-                invoice_logo_html += '    <a id="remove-invoice_logo" href="javascript:void();">';
-                invoice_logo_html += '        <span class="text-danger"><i class="fa fa fa-times"></i></span>';
-                invoice_logo_html += '    </a>';
-                invoice_logo_html += '    <input type="hidden" name="page" value="setting" />';
-                invoice_logo_html += '    <input type="hidden" name="key" value="general.invoice_logo" />';
-                invoice_logo_html += '    <input type="hidden" name="value" value="{{ $setting['invoice_logo']->id }}" />';
-                invoice_logo_html += '    {!! Form::close() !!}';
-                invoice_logo_html += '</span>';
-
-                $('#invoice .fancy-file .fake-file').append(invoice_logo_html);
-
-                $(document).on('click', '#remove-invoice_logo', function (e) {
-                    confirmDelete("#invoice_logo-{!! $setting['invoice_logo']->id !!}", "{!! trans('general.attachment') !!}", "{!! trans('general.delete_confirm', ['name' => '<strong>' . $setting['invoice_logo']->basename . '</strong>', 'type' => strtolower(trans('general.attachment'))]) !!}", "{!! trans('general.cancel') !!}", "{!! trans('general.delete')  !!}");
-                });
+            @permission('delete-common-uploads')
+            $(document).on('click', '#remove-company_logo', function (e) {
+                confirmDelete("#company_logo-{!! $setting['company_logo']->id !!}", "{!! trans('general.attachment') !!}", "{!! trans('general.delete_confirm', ['name' => '<strong>' . $setting['company_logo']->basename . '</strong>', 'type' => strtolower(trans('general.attachment'))]) !!}", "{!! trans('general.cancel') !!}", "{!! trans('general.delete')  !!}");
+            });
+            @endpermission
             @endif
+
+            var invoice_file = false;
+
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr("href");
+
+                if (target == '#invoice' && !invoice_file) {
+                    $(target + ' #invoice_logo').fancyfile({
+                        text  : '{{ trans('general.form.select.file') }}',
+                        style : 'btn-default',
+                        @if($setting['invoice_logo'])
+                        placeholder : '{{ $setting['invoice_logo']->basename }}',
+                        @else
+                        placeholder : '{{ trans('general.form.no_file_selected') }}',
+                        @endif
+                    });
+
+                    @if($setting['invoice_logo'])
+                    $.ajax({
+                        url: '{{ url('uploads/' . $setting['invoice_logo']->id . '/show') }}',
+                        type: 'GET',
+                        data: {column_name: 'invoice_logo', page: 'setting', key: 'general.invoice_logo'},
+                        dataType: 'JSON',
+                        success: function(json) {
+                            if (json['success']) {
+                                $(target + ' .fancy-file').after(json['html']);
+                            }
+                        }
+                    });
+
+                    @permission('delete-common-uploads')
+                    $(document).on('click', '#remove-invoice_logo', function (e) {
+                        confirmDelete("#invoice_logo-{!! $setting['invoice_logo']->id !!}", "{!! trans('general.attachment') !!}", "{!! trans('general.delete_confirm', ['name' => '<strong>' . $setting['invoice_logo']->basename . '</strong>', 'type' => strtolower(trans('general.attachment'))]) !!}", "{!! trans('general.cancel') !!}", "{!! trans('general.delete')  !!}");
+                    });
+                    @endpermission
+                    @endif
+
+                    invoice_file = true;
+                }
+            });
+
             $("select[name='email_protocol']").on('change', function() {
                 var selection = $(this).val();
 
@@ -283,16 +315,14 @@
                     $("input[name='email_smtp_password']").prop('disabled', true);
                     $("input[name='email_smtp_port']").prop('disabled', true);
                     $("select[name='email_smtp_encryption']").prop('disabled', true);
-                }
-                else if(selection == 'sendmail') {
+                } else if(selection == 'sendmail') {
                     $("input[name='email_sendmail_path']").prop('disabled', false);
                     $("input[name='email_smtp_host']").prop('disabled', true);
                     $("input[name='email_smtp_username']").prop('disabled', true);
                     $("input[name='email_smtp_password']").prop('disabled', true);
                     $("input[name='email_smtp_port']").prop('disabled', true);
                     $("select[name='email_smtp_encryption']").prop('disabled', true);
-                }
-                else if (selection == 'smtp') {
+                } else if (selection == 'smtp') {
                     $("input[name='email_sendmail_path']").prop('disabled', true);
                     $("input[name='email_smtp_host']").prop('disabled', false);
                     $("input[name='email_smtp_username']").prop('disabled', false);

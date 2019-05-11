@@ -5,7 +5,7 @@
 @section('content')
     <!-- Default box -->
     <div class="box box-success">
-    {!! Form::open(['url' => 'settings/currencies', 'role' => 'form']) !!}
+    {!! Form::open(['url' => 'settings/currencies', 'role' => 'form', 'class' => 'form-loading-button']) !!}
 
     <div class="box-body">
         {{ Form::textGroup('name', trans('general.name'), 'id-card-o') }}
@@ -60,6 +60,7 @@
                     dataType: 'JSON',
                     data: 'code=' + $(this).val(),
                     success: function(data) {
+                        $('#rate').val(data.rate);
                         $('#precision').val(data.precision);
                         $('#symbol').val(data.symbol);
                         $('#symbol_first').val(data.symbol_first);

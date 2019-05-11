@@ -26,7 +26,7 @@ class Roles extends Seeder
     private function roles()
     {
         $rows = [
-            'administrador' => [
+            'admin' => [
                 'admin-panel' => 'r',
                 'api' => 'r',
                 'auth-users' => 'c,r,u,d',
@@ -36,7 +36,8 @@ class Roles extends Seeder
                 'common-companies' => 'c,r,u,d',
                 'common-import' => 'c',
                 'common-items' => 'c,r,u,d',
-                'common-uploads' => 'd',
+                'common-uploads' => 'r,d',
+                'common-notifications' => 'c,r,u,d',
                 'incomes-invoices' => 'c,r,u,d',
                 'incomes-revenues' => 'c,r,u,d',
                 'incomes-customers' => 'c,r,u,d',
@@ -46,6 +47,7 @@ class Roles extends Seeder
                 'banking-accounts' => 'c,r,u,d',
                 'banking-transfers' => 'c,r,u,d',
                 'banking-transactions' => 'r',
+                'banking-reconciliations' => 'c,r,u,d',
                 'settings-categories' => 'c,r,u,d',
                 'settings-settings' => 'r,u',
                 'settings-taxes' => 'c,r,u,d',
@@ -63,13 +65,19 @@ class Roles extends Seeder
                 'reports-income-expense-summary' => 'r',
                 'reports-profit-loss' => 'r',
                 'reports-tax-summary' => 'r',
+                'wizard-companies' => 'c,r,u',
+                'wizard-currencies' => 'c,r,u',
+                'wizard-taxes' => 'c,r,u',
+                'wizard-finish' => 'c,r,u',
             ],
-            'gerente' => [
+            'manager' => [
                 'admin-panel' => 'r',
                 'auth-profile' => 'r,u',
                 'common-companies' => 'c,r,u,d',
                 'common-import' => 'c',
                 'common-items' => 'c,r,u,d',
+                'common-uploads' => 'r',
+                'common-notifications' => 'c,r,u,d',
                 'incomes-invoices' => 'c,r,u,d',
                 'incomes-revenues' => 'c,r,u,d',
                 'incomes-customers' => 'c,r,u,d',
@@ -79,10 +87,13 @@ class Roles extends Seeder
                 'banking-accounts' => 'c,r,u,d',
                 'banking-transfers' => 'c,r,u,d',
                 'banking-transactions' => 'r',
+                'banking-reconciliations' => 'c,r,u,d',
                 'settings-settings' => 'r,u',
                 'settings-categories' => 'c,r,u,d',
                 'settings-taxes' => 'c,r,u,d',
                 'settings-currencies' => 'c,r,u,d',
+                'settings-modules' => 'r,u',
+                'install-updates' => 'r,u',
                 'notifications' => 'r,u',
                 'reports-income-summary' => 'r',
                 'reports-expense-summary' => 'r',
@@ -90,7 +101,7 @@ class Roles extends Seeder
                 'reports-profit-loss' => 'r',
                 'reports-tax-summary' => 'r',
             ],
-            'cliente' => [
+            'customer' => [
                 'customer-panel' => 'r',
                 'customers-invoices' => 'r,u',
                 'customers-payments' => 'r,u',

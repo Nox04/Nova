@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: bgure
- * Date: 13.07.2018
- * Time: 19:44
- */
 
 namespace Tests\Feature;
-
 
 use App\Models\Auth\User;
 use App\Models\Common\Company;
@@ -30,9 +23,15 @@ abstract class FeatureTestCase extends TestCase
 	protected function setUp()
 	{
 		parent::setUp();
+
 		$this->faker = Factory::create();
 		$this->user = User::first();
 		$this->company = $this->user->first()->companies()->first();
+
+		// Set Company settings
+        setting()->forgetAll();
+        setting()->setExtraColumns(['company_id' => $this->company->id]);
+        setting()->load(true);
 	}
 
 	/**
@@ -44,18 +43,24 @@ abstract class FeatureTestCase extends TestCase
 	 */
 	public function loginAs(User $user = null, Company $company = null)
 	{
-		if(!$user) $user = $this->user;
-		if(!$company) $company = $user->companies()->first();
+		if (!$user) {
+		    $user = $this->user;
+		}
+
+		if (!$company) {
+		    $company = $user->companies()->first();
+		}
+
 		$this->startSession();
-		return $this->actingAs($user)
-			->withSession(['company_id' => $company->id]);
+
+		return $this->actingAs($user)->withSession(['company_id' => $company->id]);
 	}
 
 	public function assertFlashLevel($excepted)
 	{
-		$flash["level"] = null;
-		if($flashMessage = session('flash_notification'))
-		{
+		$flash['level'] = null;
+
+		if ($flashMessage = session('flash_notification')) {
 			$flash = $flashMessage->first();
 		}
 

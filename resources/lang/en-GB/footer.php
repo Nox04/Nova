@@ -3,7 +3,8 @@
 return [
 
     'version'               => 'Version',
-    'powered'               => 'Powered By Nova',
-    'software'              => 'Accounting Software',
+    'powered'               => 'Powered By Akaunting',
+    'link'                  => 'https://akaunting.com',
+    'software'              => 'Free Accounting Software',
 
 ];

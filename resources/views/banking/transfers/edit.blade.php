@@ -8,7 +8,8 @@
         {!! Form::model($transfer, [
             'method' => 'PATCH',
             'url' => ['banking/transfers', $transfer->id],
-            'role' => 'form'
+            'role' => 'form',
+            'class' => 'form-loading-button'
         ]) !!}
 
         <div class="box-body">
@@ -25,6 +26,9 @@
             {{ Form::selectGroup('payment_method', trans_choice('general.payment_methods', 1), 'credit-card', $payment_methods, null) }}
 
             {{ Form::textGroup('reference', trans('general.reference'), 'file-text-o', []) }}
+
+            {!! Form::hidden('currency_code', $currency->code, ['id' => 'currency_code']) !!}
+            {!! Form::hidden('currency_rate', $currency->rate, ['id' => 'currency_rate']) !!}
         </div>
         <!-- /.box-body -->
 
@@ -41,7 +45,9 @@
 
 @push('js')
     <script src="{{ asset('vendor/almasaeed2010/adminlte/plugins/datepicker/bootstrap-datepicker.js') }}"></script>
+    @if (language()->getShortCode() != 'en')
     <script src="{{ asset('vendor/almasaeed2010/adminlte/plugins/datepicker/locales/bootstrap-datepicker.' . language()->getShortCode() . '.js') }}"></script>
+    @endif
 @endpush
 
 @push('css')
@@ -51,9 +57,24 @@
 @push('scripts')
     <script type="text/javascript">
         $(document).ready(function(){
+            $("#amount").maskMoney({
+                thousands : '{{ $currency->thousands_separator }}',
+                decimal : '{{ $currency->decimal_mark }}',
+                precision : {{ $currency->precision }},
+                allowZero : true,
+                @if($currency->symbol_first)
+                prefix : '{{ $currency->symbol }}'
+                @else
+                suffix : '{{ $currency->symbol }}'
+                @endif
+            });
+
+            $("#amount").focusout();
+
             //Date picker
             $('#transferred_at').datepicker({
                 format: 'yyyy-mm-dd',
+                todayBtn: 'linked',
                 weekStart: 1,
                 autoclose: true,
                 language: '{{ language()->getShortCode() }}'
@@ -69,6 +90,36 @@
 
             $("#payment_method").select2({
                 placeholder: "{{ trans_choice('general.payment_methods', 1) }}"
+            });
+        });
+
+        $(document).on('change', '#from_account_id', function (e) {
+            $.ajax({
+                url: '{{ url("banking/accounts/currency") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: 'account_id=' + $(this).val(),
+                success: function(data) {
+                    $('#currency').val(data.currency_code);
+
+                    $('#currency_code').val(data.currency_code);
+                    $('#currency_rate').val(data.currency_rate);
+
+                    amount = $('#amount').maskMoney('unmasked')[0];
+
+                    $("#amount").maskMoney({
+                        thousands : data.thousands_separator,
+                        decimal : data.decimal_mark,
+                        precision : data.precision,
+                        allowZero : true,
+                        prefix : (data.symbol_first) ? data.symbol : '',
+                        suffix : (data.symbol_first) ? '' : data.symbol
+                    });
+
+                    $('#amount').val(amount);
+
+                    $('#amount').trigger('focus');
+                }
             });
         });
     </script>

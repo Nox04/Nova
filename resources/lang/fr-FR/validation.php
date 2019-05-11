@@ -101,6 +101,8 @@ return [
         'attribute-name' => [
             'rule-name' => 'Un message spécifique sera affiché si le paramètre \'Utiliser message spécifique\' est implémenté pour le champ \'Message hors-ligne\'',
         ],
+        'invalid_currency' => 'Le code de :attribute est invalide.',
+        'invalid_amount'   => 'Le montant :amount n\'est pas valide.',
     ],
 
     /*

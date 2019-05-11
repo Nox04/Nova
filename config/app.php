@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => env('APP_NAME', 'Nova'),
+    'name' => env('APP_NAME', 'Akaunting'),
 
     /*
     |--------------------------------------------------------------------------
@@ -187,6 +187,7 @@ return [
         Akaunting\Language\Provider::class,
         Akaunting\Money\Provider::class,
         Akaunting\Setting\Provider::class,
+        Akaunting\SignedUrl\Provider::class,
         Akaunting\Version\Provider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Bkwld\Cloner\ServiceProvider::class,
@@ -273,6 +274,7 @@ return [
         'Module' => Nwidart\Modules\Facades\Module::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'Setting' => Akaunting\Setting\Facade::class,
+        'SignedUrl' => Akaunting\SignedUrl\Facade::class,
         'Version' => Akaunting\Version\Facade::class,
 
     ],

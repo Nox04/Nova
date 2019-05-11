@@ -14,6 +14,7 @@ use App\Traits\DateTime;
 use App\Traits\Uploads;
 use App\Utilities\Installer;
 use App\Utilities\Modules;
+use Date;
 
 class Settings extends Controller
 {
@@ -26,20 +27,14 @@ class Settings extends Controller
      */
     public function edit()
     {
-        /*$setting = Setting::all()->pluck('value', 'key');*/
         $setting = Setting::all()->map(function ($s) {
             $s->key = str_replace('general.', '', $s->key);
 
             return $s;
         })->pluck('value', 'key');
 
-        $company_logo = $setting->pull('company_logo');
-
-        $setting['company_logo'] = Media::find($company_logo);
-
-        $invoice_logo = $setting->pull('invoice_logo');
-
-        $setting['invoice_logo'] = Media::find($invoice_logo);
+        $setting->put('company_logo', Media::find($setting->pull('company_logo')));
+        $setting->put('invoice_logo', Media::find($setting->pull('invoice_logo')));
 
         $timezones = $this->getTimezones();
 
@@ -47,7 +42,7 @@ class Settings extends Controller
 
         $currencies = Currency::enabled()->orderBy('name')->pluck('name', 'code');
 
-        $taxes = Tax::enabled()->orderBy('rate')->get()->pluck('title', 'id');
+        $taxes = Tax::enabled()->orderBy('name')->get()->pluck('title', 'id');
 
         $payment_methods = Modules::getPaymentMethods();
 
@@ -65,6 +60,24 @@ class Settings extends Controller
             'dot' => trans('settings.localisation.date.dot'),
             'comma' => trans('settings.localisation.date.comma'),
             'space' => trans('settings.localisation.date.space'),
+        ];
+
+        $item_names = [
+            'settings.invoice.item' => trans('settings.invoice.item'),
+            'settings.invoice.product' => trans('settings.invoice.product'),
+            'settings.invoice.service' =>  trans('settings.invoice.service'),
+            'custom' => trans('settings.invoice.custom'),
+        ];
+
+        $price_names = [
+            'settings.invoice.price' => trans('settings.invoice.price'),
+            'settings.invoice.rate' => trans('settings.invoice.rate'),
+            'custom' => trans('settings.invoice.custom'),
+        ];
+
+        $quantity_names = [
+            'settings.invoice.quantity' => trans('settings.invoice.quantity'),
+            'custom' => trans('settings.invoice.custom'),
         ];
 
         $email_protocols = [
@@ -88,6 +101,9 @@ class Settings extends Controller
             'payment_methods',
             'date_formats',
             'date_separators',
+            'item_names',
+            'price_names',
+            'quantity_names',
             'email_protocols',
             'percent_positions'
         ));
@@ -159,19 +175,22 @@ class Settings extends Controller
 
     protected function oneCompany($key, $value)
     {
-        /*switch ($key) {
+        switch ($key) {
+            case 'company_name':
+                Installer::updateEnv(['MAIL_FROM_NAME' => '"' . $value . '"']);
+                break;
+            case 'company_email':
+                Installer::updateEnv(['MAIL_FROM_ADDRESS' => $value]);
+                break;
             case 'default_locale':
-                // Change default locale
-                Installer::updateEnv([
-                    'APP_LOCALE' => $value
-                ]);
+                Installer::updateEnv(['APP_LOCALE' => $value]);
                 break;
             case 'session_handler':
-                // Change session handler
-                Installer::updateEnv([
-                    'SESSION_DRIVER' => $value
-                ]);
+                Installer::updateEnv(['SESSION_DRIVER' => $value]);
                 break;
-        }*/
+            case 'schedule_time':
+                Installer::updateEnv(['APP_SCHEDULE_TIME' => '"' . $value . '"']);
+                break;
+        }
     }
 }

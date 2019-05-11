@@ -16,8 +16,10 @@ use App\Traits\DateTime;
 use App\Traits\Uploads;
 use App\Utilities\Modules;
 use File;
+use Illuminate\Http\Request;
 use Image;
 use Storage;
+use SignedUrl;
 
 class Invoices extends Controller
 {
@@ -30,12 +32,18 @@ class Invoices extends Controller
      */
     public function index()
     {
-        $invoices = Invoice::with('status')->accrued()->where('customer_id', auth()->user()->customer->id)->paginate();
+        $invoices = Invoice::with(['customer', 'status', 'items', 'payments', 'histories'])
+            ->accrued()->where('customer_id', auth()->user()->customer->id)
+            ->collect(['invoice_number'=> 'desc']);
 
-        $status = collect(InvoiceStatus::all()->pluck('name', 'code'))
-            ->prepend(trans('general.all_type', ['type' => trans_choice('general.statuses', 2)]), '');
+        $categories = collect(Category::enabled()->type('income')->orderBy('name')->pluck('name', 'id'));
 
-        return view('customers.invoices.index', compact('invoices', 'status'));
+        $statuses = collect(InvoiceStatus::get()->each(function ($item) {
+            $item->name = trans('invoices.status.' . $item->code);
+            return $item;
+        })->pluck('name', 'code'));
+
+        return view('customers.invoices.index', compact('invoices', 'categories', 'statuses'));
     }
 
     /**
@@ -47,31 +55,15 @@ class Invoices extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $paid = 0;
+        $accounts = Account::enabled()->orderBy('name')->pluck('name', 'id');
 
-        foreach ($invoice->payments as $item) {
-            $amount = $item->amount;
-
-            if ($invoice->currency_code != $item->currency_code) {
-                $item->default_currency_code = $invoice->currency_code;
-
-                $amount = $item->getDynamicConvertedAmount();
-            }
-
-            $paid += $amount;
-        }
-
-        $invoice->paid = $paid;
-
-        $accounts = Account::enabled()->pluck('name', 'id');
-
-        $currencies = Currency::enabled()->pluck('name', 'code')->toArray();
+        $currencies = Currency::enabled()->orderBy('name')->pluck('name', 'code')->toArray();
 
         $account_currency_code = Account::where('id', setting('general.default_account'))->pluck('currency_code')->first();
 
-        $customers = Customer::enabled()->pluck('name', 'id');
+        $customers = Customer::enabled()->orderBy('name')->pluck('name', 'id');
 
-        $categories = Category::enabled()->type('income')->pluck('name', 'id');
+        $categories = Category::enabled()->type('income')->orderBy('name')->pluck('name', 'id');
 
         $payment_methods = Modules::getPaymentMethods();
 
@@ -89,9 +81,7 @@ class Invoices extends Controller
     {
         $invoice = $this->prepareInvoice($invoice);
 
-        $logo = $this->getLogo();
-
-        return view($invoice->template_path, compact('invoice', 'logo'));
+        return view($invoice->template_path, compact('invoice'));
     }
 
     /**
@@ -105,9 +95,10 @@ class Invoices extends Controller
     {
         $invoice = $this->prepareInvoice($invoice);
 
-        $logo = $this->getLogo();
+        $currency_style = true;
 
-        $html = view($invoice->template_path, compact('invoice', 'logo'))->render();
+        $view = view($invoice->template_path, compact('invoice', 'currency_style'))->render();
+        $html = mb_convert_encoding($view, 'HTML-ENTITIES');
 
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($html);
@@ -144,38 +135,53 @@ class Invoices extends Controller
         return $invoice;
     }
 
-    protected function getLogo()
+    public function link(Invoice $invoice, Request $request)
     {
-        $logo = '';
-
-        $media_id = setting('general.company_logo');
-
-        if (setting('general.invoice_logo')) {
-            $media_id = setting('general.invoice_logo');
+        if (empty($invoice)) {
+            redirect()->route('login');
         }
 
-        $media = Media::find($media_id);
+        $paid = 0;
 
-        if (!empty($media)) {
-            $path = Storage::path($media->getDiskPath());
+        foreach ($invoice->payments as $item) {
+            $amount = $item->amount;
 
-            if (!is_file($path)) {
-                return $logo;
+            if ($invoice->currency_code != $item->currency_code) {
+                $item->default_currency_code = $invoice->currency_code;
+
+                $amount = $item->getDynamicConvertedAmount();
             }
-        } else {
-            $path = asset('public/img/company.png');
+
+            $paid += $amount;
         }
 
-        $image = Image::make($path)->encode()->getEncoded();
+        $invoice->paid = $paid;
 
-        if (empty($image)) {
-            return $logo;
+        $accounts = Account::enabled()->pluck('name', 'id');
+
+        $currencies = Currency::enabled()->pluck('name', 'code')->toArray();
+
+        $account_currency_code = Account::where('id', setting('general.default_account'))->pluck('currency_code')->first();
+
+        $customers = Customer::enabled()->pluck('name', 'id');
+
+        $categories = Category::enabled()->type('income')->pluck('name', 'id');
+
+        $payment_methods = Modules::getPaymentMethods();
+
+        $payment_actions = [];
+
+        foreach ($payment_methods as $payment_method_key => $payment_method_value) {
+            $codes = explode('.', $payment_method_key);
+
+            if (!isset($payment_actions[$codes[0]])) {
+                $payment_actions[$codes[0]] = SignedUrl::sign(url('signed/invoices/' . $invoice->id . '/' . $codes[0]), 1);
+            }
         }
 
-        $extension = File::extension($path);
+        $print_action = SignedUrl::sign(route('signed.invoices.print', $invoice->id), 1);
+        $pdf_action = SignedUrl::sign(route('signed.invoices.pdf', $invoice->id), 1);
 
-        $logo = 'data:image/' . $extension . ';base64,' . base64_encode($image);
-
-        return $logo;
+        return view('customers.invoices.link', compact('invoice', 'accounts', 'currencies', 'account_currency_code', 'customers', 'categories', 'payment_methods', 'payment_actions', 'print_action', 'pdf_action'));
     }
 }

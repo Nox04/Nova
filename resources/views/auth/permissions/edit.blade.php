@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', trans('general.title.edit', ['type' => trans_choice('general.permission', 1)]))
+@section('title', trans('general.title.edit', ['type' => trans_choice('general.permissions', 1)]))
 
 @section('content')
     <!-- Default box -->
@@ -8,7 +8,8 @@
         {!! Form::model($permission, [
             'method' => 'PATCH',
             'url' => ['auth/permissions', $permission->id],
-            'role' => 'form'
+            'role' => 'form',
+            'class' => 'form-loading-button'
         ]) !!}
 
         <div class="box-body">

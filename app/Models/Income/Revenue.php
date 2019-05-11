@@ -119,7 +119,7 @@ class Revenue extends Model
      */
     public function setAmountAttribute($value)
     {
-        $this->attributes['amount'] = (double) money($value, $this->attributes['currency_code'])->getAmount();
+        $this->attributes['amount'] = (double) $value;
     }
 
     /**
@@ -131,17 +131,6 @@ class Revenue extends Model
     public function setCurrencyRateAttribute($value)
     {
         $this->attributes['currency_rate'] = (double) $value;
-    }
-
-    /**
-     * Convert paid_at to datetime.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setPaidAtAttribute($value)
-    {
-        $this->attributes['paid_at'] = $value . ' ' . Date::now()->format('H:i:s');
     }
 
     public function scopeLatest($query)

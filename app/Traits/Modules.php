@@ -3,15 +3,15 @@
 namespace App\Traits;
 
 use App\Utilities\Info;
+use App\Models\Module\Module as Model;
 use Artisan;
+use Cache;
+use Date;
 use File;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Module;
-use App\Models\Module\Module as MModule;
 use ZipArchive;
-use Cache;
-use Date;
 
 trait Modules
 {
@@ -57,6 +57,28 @@ trait Modules
         return [];
     }
 
+    public function getDocumentation($alias)
+    {
+        $response = $this->getRemote('apps/docs/' . $alias);
+
+        if ($response && ($response->getStatusCode() == 200)) {
+            return json_decode($response->getBody())->data;
+        }
+
+        return [];
+    }
+
+    public function getModuleReviews($alias, $data = [])
+    {
+        $response = $this->getRemote('apps/' . $alias . '/reviews', 'GET', $data);
+
+        if ($response && ($response->getStatusCode() == 200)) {
+            return json_decode($response->getBody())->data;
+        }
+
+        return [];
+    }
+
     public function getCategories()
     {
         $response = $this->getRemote('apps/categories');
@@ -68,9 +90,31 @@ trait Modules
         return [];
     }
 
-    public function getModulesByCategory($alias)
+    public function getModulesByCategory($alias, $data = [])
     {
-        $response = $this->getRemote('apps/categories/' . $alias);
+        $response = $this->getRemote('apps/categories/' . $alias, 'GET', $data);
+
+        if ($response && ($response->getStatusCode() == 200)) {
+            return json_decode($response->getBody())->data;
+        }
+
+        return [];
+    }
+
+    public function getVendors()
+    {
+        $response = $this->getRemote('apps/vendors');
+
+        if ($response && ($response->getStatusCode() == 200)) {
+            return json_decode($response->getBody())->data;
+        }
+
+        return [];
+    }
+
+    public function getModulesByVendor($alias, $data = [])
+    {
+        $response = $this->getRemote('apps/vendors/' . $alias, 'GET', $data);
 
         if ($response && ($response->getStatusCode() == 200)) {
             return json_decode($response->getBody())->data;
@@ -104,7 +148,7 @@ trait Modules
 
         $installed = [];
         $modules = Module::all();
-        $installed_modules = MModule::where('company_id', '=', session('company_id'))->pluck('status', 'alias')->toArray();
+        $installed_modules = Model::where('company_id', '=', session('company_id'))->pluck('status', 'alias')->toArray();
 
         foreach ($modules as $module) {
             if (!array_key_exists($module->alias, $installed_modules)) {
@@ -121,6 +165,17 @@ trait Modules
         Cache::put($cache, $installed, Date::now()->addHour(6));
 
         return $installed;
+    }
+
+    public function getPreSaleModules($data = [])
+    {
+        $response = $this->getRemote('apps/pre_sale', 'GET', $data);
+
+        if ($response && ($response->getStatusCode() == 200)) {
+            return json_decode($response->getBody())->data;
+        }
+
+        return [];
     }
 
     public function getPaidModules($data = [])
@@ -159,6 +214,17 @@ trait Modules
     public function getSearchModules($data = [])
     {
         $response = $this->getRemote('apps/search', 'GET', $data);
+
+        if ($response && ($response->getStatusCode() == 200)) {
+            return json_decode($response->getBody())->data;
+        }
+
+        return [];
+    }
+
+    public function getFeaturedModules($data = [])
+    {
+        $response = $this->getRemote('apps/featured', 'GET', $data);
 
         if ($response && ($response->getStatusCode() == 200)) {
             return json_decode($response->getBody())->data;
@@ -305,9 +371,12 @@ trait Modules
             'version' => $module->get('version'),
         ];
 
+        Artisan::call('cache:clear');
+
         $module->delete();
 
-        Artisan::call('cache:clear');
+        // Cache Data clear
+        File::deleteDirectory(storage_path('framework/cache/data'));
 
         return [
             'success' => true,
@@ -358,6 +427,17 @@ trait Modules
         ];
     }
 
+    public function moduleExists($alias)
+    {
+        $status = false;
+
+        if (Module::findByAlias($alias) instanceof \Nwidart\Modules\Module) {
+            $status = true;
+        }
+
+        return $status;
+    }
+
     public function loadSuggestions()
     {
         // Get data from cache
@@ -394,6 +474,42 @@ trait Modules
         return $data;
     }
 
+    public function loadNotifications()
+    {
+        // Get data from cache
+        $data = Cache::get('notifications');
+
+        if (!empty($data)) {
+            return $data;
+        }
+
+        $data = [];
+
+        $url = 'apps/notifications';
+
+        $response = $this->getRemote($url, 'GET', ['timeout' => 30, 'referer' => true]);
+
+        // Exception
+        if ($response instanceof RequestException) {
+            return false;
+        }
+
+        // Bad response
+        if (!$response || ($response->getStatusCode() != 200)) {
+            return false;
+        }
+
+        $notifications = json_decode($response->getBody())->data;
+
+        foreach ($notifications as $notification) {
+            $data[$notification->path][] = $notification;
+        }
+
+        Cache::put('notifications', $data, Date::now()->addHour(6));
+
+        return $data;
+    }
+
     public function getSuggestions($path)
     {
         // Get data from cache
@@ -401,6 +517,22 @@ trait Modules
 
         if (empty($data)) {
             $data = $this->loadSuggestions();
+        }
+
+        if (!empty($data) && array_key_exists($path, $data)) {
+            return $data[$path];
+        }
+
+        return false;
+    }
+
+    public function getNotifications($path)
+    {
+        // Get data from cache
+        $data = Cache::get('notifications');
+
+        if (empty($data)) {
+            $data = $this->loadNotifications();
         }
 
         if (!empty($data) && array_key_exists($path, $data)) {
@@ -419,8 +551,9 @@ trait Modules
         $headers['headers'] = [
             'Authorization' => 'Bearer ' . setting('general.api_token'),
             'Accept'        => 'application/json',
-            'Referer'       => env('APP_URL'),
+            'Referer'       => url('/'),
             'Akaunting'     => version('short'),
+            'Language'      => language()->getShortCode()
         ];
 
         $data['http_errors'] = false;

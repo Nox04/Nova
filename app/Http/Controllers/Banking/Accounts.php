@@ -40,8 +40,10 @@ class Accounts extends Controller
     public function create()
     {
         $currencies = Currency::enabled()->pluck('name', 'code');
-        
-        return view('banking.accounts.create', compact('currencies'));
+
+        $currency = Currency::where('code', '=', setting('general.default_currency', 'USD'))->first();
+
+        return view('banking.accounts.create', compact('currencies', 'currency'));
     }
 
     /**
@@ -79,9 +81,11 @@ class Accounts extends Controller
     {
         $currencies = Currency::enabled()->pluck('name', 'code');
 
-        $account->default_account = ($account->id == setting('general.default_account')) ?: 1;
-        
-        return view('banking.accounts.edit', compact('account', 'currencies'));
+        $account->default_account = ($account->id == setting('general.default_account')) ? 1 : 0;
+
+        $currency = Currency::where('code', '=', $account->currency_code)->first();
+
+        return view('banking.accounts.edit', compact('account', 'currencies', 'currency'));
     }
 
     /**
@@ -94,9 +98,16 @@ class Accounts extends Controller
      */
     public function update(Account $account, Request $request)
     {
-        // Check if we can disable it
-        if (!$request['enabled']) {
-            if ($account->id == setting('general.default_account')) {
+        // Check if we can disable or change the code
+        if (!$request['enabled'] || ($account->currency_code != $request['currency_code'])) {
+            $relationships = $this->countRelationships($account, [
+                'invoice_payments' => 'invoices',
+                'revenues' => 'revenues',
+                'bill_payments' => 'bills',
+                'payments' => 'payments',
+            ]);
+
+            if (!$request['enabled'] && $account->id == setting('general.default_account')) {
                 $relationships[] = strtolower(trans_choice('general.companies', 1));
             }
         }
@@ -116,7 +127,7 @@ class Accounts extends Controller
 
             return redirect('banking/accounts');
         } else {
-            $message = trans('messages.warning.disabled', ['name' => $account->name, 'text' => implode(', ', $relationships)]);
+            $message = trans('messages.warning.disable_code', ['name' => $account->name, 'text' => implode(', ', $relationships)]);
 
             flash($message)->warning();
 
@@ -167,8 +178,6 @@ class Accounts extends Controller
             $message = trans('messages.warning.disabled', ['name' => $account->name, 'text' => implode(', ', $relationships)]);
 
             flash($message)->warning();
-
-            return redirect()->route('accounts.index');
         }
 
         return redirect()->route('accounts.index');
@@ -236,8 +245,15 @@ class Accounts extends Controller
         // Get currency object
         $currency = Currency::where('code', $currency_code)->first();
 
+        $account->currency_name = $currency->name;
         $account->currency_code = $currency_code;
         $account->currency_rate = $currency->rate;
+
+        $account->thousands_separator = $currency->thousands_separator;
+        $account->decimal_mark = $currency->decimal_mark;
+        $account->precision = (int) $currency->precision;
+        $account->symbol_first = $currency->symbol_first;
+        $account->symbol = $currency->symbol;
 
         return response()->json($account);
     }

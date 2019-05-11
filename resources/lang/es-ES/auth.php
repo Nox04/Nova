@@ -4,7 +4,7 @@ return [
 
     'profile'               => 'Perfil',
     'logout'                => 'Salir',
-    'login'                 => 'Ingresar',
+    'login'                 => 'Iniciar sesión',
     'login_to'              => 'Inicia sesión para empezar',
     'remember_me'           => 'Recordarme',
     'forgot_password'       => 'Olvidé mi contraseña',
@@ -15,7 +15,7 @@ return [
     'never'                 => 'nunca',
     
     'password' => [
-        'current'           => 'Contraseña actual',
+        'current'           => 'Actual',
         'current_confirm'   => 'Confirmar contraseña',
         'new'               => 'Nueva contraseña',
         'new_confirm'       => 'Confirmar contraseña',

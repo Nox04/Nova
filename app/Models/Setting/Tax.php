@@ -21,7 +21,7 @@ class Tax extends Model
      *
      * @var array
      */
-    protected $fillable = ['company_id', 'name', 'rate', 'enabled'];
+    protected $fillable = ['company_id', 'name', 'rate', 'type', 'enabled'];
 
     /**
      * Sortable columns.
@@ -37,12 +37,12 @@ class Tax extends Model
 
     public function bill_items()
     {
-        return $this->hasMany('App\Models\Expense\BillItem');
+        return $this->hasMany('App\Models\Expense\BillItemTax');
     }
 
     public function invoice_items()
     {
-        return $this->hasMany('App\Models\Income\InvoiceItem');
+        return $this->hasMany('App\Models\Income\InvoiceItemTax');
     }
 
     /**

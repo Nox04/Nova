@@ -39,6 +39,14 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\AddXHeader::class,
             'company.settings',
             'company.currencies',
+            \App\Http\Middleware\RedirectIfWizardCompleted::class,
+        ],
+
+        'wizard' => [
+            'web',
+            'language',
+            'auth',
+            'permission:read-admin-panel',
         ],
 
         'admin' => [
@@ -66,6 +74,20 @@ class Kernel extends HttpKernel
             'company.settings',
             'company.currencies',
         ],
+
+        'signed' => [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+            'signed-url',
+            'signed-url.company',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\AddXHeader::class,
+            'company.settings',
+            'company.currencies',
+        ]
     ];
 
     /**
@@ -91,5 +113,8 @@ class Kernel extends HttpKernel
         'install' => \App\Http\Middleware\CanInstall::class,
         'company.settings' => \App\Http\Middleware\LoadSettings::class,
         'company.currencies' => \App\Http\Middleware\LoadCurrencies::class,
+        'dateformat' => \App\Http\Middleware\DateFormat::class,
+        'money' => \App\Http\Middleware\Money::class,
+        'signed-url.company' => \App\Http\Middleware\SignedUrlCompany::class,
     ];
 }

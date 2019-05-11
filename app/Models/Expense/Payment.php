@@ -113,7 +113,7 @@ class Payment extends Model
      */
     public function setAmountAttribute($value)
     {
-        $this->attributes['amount'] = (double) money($value, $this->attributes['currency_code'])->getAmount();
+        $this->attributes['amount'] = (double) $value;
     }
 
     /**
@@ -130,17 +130,6 @@ class Payment extends Model
     public static function scopeLatest($query)
     {
         return $query->orderBy('paid_at', 'desc');
-    }
-
-    /**
-     * Convert paid_at to datetime.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setPaidAtAttribute($value)
-    {
-        $this->attributes['paid_at'] = $value . ' ' . Date::now()->format('H:i:s');
     }
 
     /**

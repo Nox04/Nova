@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Install;
 
 use App\Http\Controllers\Controller;
-use App\Events\UpdateFinished;
 use App\Utilities\Updater;
 use App\Utilities\Versions;
-use Artisan;
+use Illuminate\Http\Request;
 use Module;
 
 class Updates extends Controller
@@ -80,41 +79,158 @@ class Updates extends Controller
      */
     public function update($alias, $version)
     {
-        set_time_limit(600); // 10 minutes
+        if ($alias == 'core') {
+            $name = 'Akaunting ' . $version;
 
-        if (Updater::update($alias, $version)) {
-            return redirect('install/updates/post/' . $alias . '/' . version('short') . '/' . $version);
+            $installed = version('short');
+        } else {
+            // Get module instance
+            $module = Module::findByAlias($alias);
+
+            $name = $module->get('name');
+
+            $installed = $module->get('version');
         }
 
-        flash(trans('updates.error'))->error()->important();
-
-        return redirect()->back();
+        return view('install.updates.edit', compact('alias', 'name', 'installed', 'version'));
     }
 
     /**
-     * Final actions post update.
+     * Show the form for viewing the specified resource.
      *
-     * @param  $alias
-     * @param  $old
-     * @param  $new
+     * @param  $request
+     *
      * @return Response
      */
-    public function post($alias, $old, $new)
+    public function steps(Request $request)
     {
-        // Check if the file mirror was successful
-        if (($alias == 'core') && (version('short') != $new)) {
-            flash(trans('updates.error'))->error()->important();
+        $json = [];
+        $json['step'] = [];
 
-            return redirect('install/updates');
+        $name = $request['name'];
+        $version = $request['version'];
+
+        // Download
+        $json['step'][] = [
+            'text' => trans('modules.installation.download', ['module' => $name]),
+            'url'  => url('install/updates/download')
+        ];
+
+        // Unzip
+        $json['step'][] = [
+            'text' => trans('modules.installation.unzip', ['module' => $name]),
+            'url'  => url('install/updates/unzip')
+        ];
+
+        // File Copy
+        $json['step'][] = [
+            'text' => trans('modules.installation.file_copy', ['module' => $name]),
+            'url'  => url('install/updates/file-copy')
+        ];
+
+        // Migrate DB and trigger event UpdateFinish event
+        $json['step'][] = [
+            'text' => trans('modules.installation.migrate', ['module' => $name]),
+            'url'  => url('install/updates/migrate')
+        ];
+
+        // redirect update page
+        $json['step'][] = [
+            'text' => trans('modules.installation.finish'),
+            'url'  => url('install/updates/finish')
+        ];
+
+        return response()->json($json);
+    }
+
+    /**
+     * Show the form for viewing the specified resource.
+     *
+     * @param  $request
+     *
+     * @return Response
+     */
+    public function download(Request $request)
+    {
+        set_time_limit(600); // 10 minutes
+
+        if ($request['alias'] != 'core') {
+            $this->checkApiToken();
         }
 
-        // Clear cache after update
-        Artisan::call('cache:clear');
+        $json = Updater::download($request['name'], $request['alias'], $request['version']);
 
-        event(new UpdateFinished($alias, $old, $new));
+        return response()->json($json);
+    }
 
-        flash(trans('updates.success'))->success();
+    /**
+     * Show the form for viewing the specified resource.
+     *
+     * @param  $request
+     *
+     * @return Response
+     */
+    public function unzip(Request $request)
+    {
+        set_time_limit(600); // 10 minutes
 
-        return redirect('install/updates');
+        if ($request['alias'] != 'core') {
+            $this->checkApiToken();
+        }
+
+        $json = Updater::unzip($request['name'], $request['path']);
+
+        return response()->json($json);
+    }
+
+    /**
+     * Show the form for viewing the specified resource.
+     *
+     * @param  $request
+     *
+     * @return Response
+     */
+    public function fileCopy(Request $request)
+    {
+        set_time_limit(600); // 10 minutes
+
+        if ($request['alias'] != 'core') {
+            $this->checkApiToken();
+        }
+
+        $json = Updater::fileCopy($request['name'], $request['alias'], $request['path'], $request['version']);
+
+        return response()->json($json);
+    }
+
+    /**
+     * Show the form for viewing the specified resource.
+     *
+     * @param  $request
+     *
+     * @return Response
+     */
+    public function migrate(Request $request)
+    {
+        $json = Updater::migrate($request['name'], $request['alias'], $request['version'], $request['installed']);
+
+        return response()->json($json);
+    }
+
+    /**
+     * Show the form for viewing the specified resource.
+     *
+     * @param  $request
+     *
+     * @return Response
+     */
+    public function finish(Request $request)
+    {
+        return response()->json([
+            'success' => true,
+            'errors' => false,
+            'redirect' => url("install/updates"),
+            'data' => [],
+        ]);
     }
 }

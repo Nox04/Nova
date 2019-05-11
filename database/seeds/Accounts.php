@@ -4,7 +4,6 @@ namespace Database\Seeds;
 
 use App\Models\Model;
 use App\Models\Banking\Account;
-use Setting;
 use Illuminate\Database\Seeder;
 
 class Accounts extends Seeder
@@ -27,12 +26,15 @@ class Accounts extends Seeder
     {
         $company_id = $this->command->argument('company');
 
+        setting()->forgetAll();
+        setting()->setExtraColumns(['company_id' => $company_id]);
+
         $rows = [
             [
                 'company_id' => $company_id,
                 'name' => trans('demo.accounts_cash'),
                 'number' => '1',
-                'currency_code' => 'COP',
+                'currency_code' => 'USD',
                 'bank_name' => trans('demo.accounts_cash'),
                 'enabled' => '1',
             ],
@@ -41,7 +43,7 @@ class Accounts extends Seeder
         foreach ($rows as $row) {
             $account = Account::create($row);
 
-            Setting::set('general.default_account', $account->id);
+            setting()->set('general.default_account', $account->id);
         }
     }
 }

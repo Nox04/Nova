@@ -70,7 +70,7 @@ class AdminMenu
                 ]);
             }
 
-            // Expences
+            // Expenses
             if ($user->can(['read-expenses-bills', 'read-expenses-payments', 'read-expenses-vendors'])) {
                 $menu->dropdown(trans_choice('general.expenses', 2), function ($sub) use($user, $attr) {
                     if ($user->can('read-expenses-bills')) {
@@ -91,7 +91,7 @@ class AdminMenu
             }
 
             // Banking
-            if ($user->can(['read-banking-accounts', 'read-banking-transfers', 'read-banking-transactions'])) {
+            if ($user->can(['read-banking-accounts', 'read-banking-transfers', 'read-banking-transactions', 'read-banking-reconciliations'])) {
                 $menu->dropdown(trans('general.banking'), function ($sub) use($user, $attr) {
                     if ($user->can('read-banking-accounts')) {
                         $sub->url('banking/accounts', trans_choice('general.accounts', 2), 1, $attr);
@@ -103,6 +103,10 @@ class AdminMenu
 
                     if ($user->can('read-banking-transactions')) {
                         $sub->url('banking/transactions', trans_choice('general.transactions', 2), 3, $attr);
+                    }
+
+                    if ($user->can('read-banking-reconciliations')) {
+                        $sub->url('banking/reconciliations', trans_choice('general.reconciliations', 2), 4, $attr);
                     }
                 }, 5, [
                     'title' => trans('general.banking'),
@@ -164,7 +168,7 @@ class AdminMenu
                     }
 
                     // Modules
-                    /*$modules = Module::all();
+                    $modules = Module::all();
                     $position = 5;
                     foreach ($modules as $module) {
                         if (!$module->status) {
@@ -181,7 +185,7 @@ class AdminMenu
                         $sub->url('settings/apps/' . $module->alias, title_case(str_replace('_', ' ', snake_case($m->getName()))), $position, $attr);
 
                         $position++;
-                    }*/
+                    }
                 }, 7, [
                     'title' => trans_choice('general.settings', 2),
                     'icon' => 'fa fa-gears',
@@ -189,14 +193,14 @@ class AdminMenu
             }
 
             // Apps
-            /*if ($user->can('read-modules-home')) {
+            if ($user->can('read-modules-home')) {
                 $menu->add([
                     'url' => 'apps/home',
                     'title' => trans_choice('general.modules', 2),
                     'icon' => 'fa fa-rocket',
                     'order' => 8,
                 ]);
-            }*/
+            }
 
             // Fire the event to extend the menu
             event(new AdminMenuCreated($menu));

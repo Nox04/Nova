@@ -61,7 +61,7 @@ class BillPayment extends Model
      */
     public function setAmountAttribute($value)
     {
-        $this->attributes['amount'] = (double) money($value, $this->account->currency_code)->getAmount();
+        $this->attributes['amount'] = (double) $value;
     }
 
     /**
@@ -87,17 +87,6 @@ class BillPayment extends Model
     }
 
     /**
-     * Convert paid_at to datetime.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setPaidAtAttribute($value)
-    {
-        $this->attributes['paid_at'] = $value . ' ' . Date::now()->format('H:i:s');
-    }
-
-    /**
      * Get the current balance.
      *
      * @return string
@@ -111,5 +100,10 @@ class BillPayment extends Model
         }
 
         return $this->getMedia('attachment')->last();
+    }
+
+    public function getDivideConvertedAmount($format = false)
+    {
+        return $this->divide($this->amount, $this->currency_code, $this->currency_rate, $format);
     }
 }

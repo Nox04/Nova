@@ -10,7 +10,7 @@ return [
     'payables'                  => 'Cuentas por pagar',
     'open_bills'                => 'Facturas Pendientes',
     'overdue_bills'             => 'Facturas Vencidas',
-    'total_profit'              => 'Ganancias Totales',
+    'total_profit'              => 'Ingresos Totales',
     'open_profit'               => 'Ingresos Pendientes',
     'overdue_profit'            => 'Ingresos Vencidos',
     'cash_flow'                 => 'Flujo de efectivo',

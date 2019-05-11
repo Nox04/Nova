@@ -2,23 +2,23 @@
 
 return [
 
-    'name'      =>  'Nova',
+    'name'      =>  'Akaunting',
 
-    'code'      =>  'Recurring',
+    'code'      =>  'Reconciliation',
 
     'major'     =>  '1',
 
-    'minor'     =>  '2',
+    'minor'     =>  '3',
 
-    'patch'     =>  '12',
+    'patch'     =>  '17',
 
     'build'     =>  '',
 
     'status'    =>  'Stable',
 
-    'date'      =>  '26-July-2018',
+    'date'      =>  '10-April-2019',
 
-    'time'      =>  '16:00',
+    'time'      =>  '21:45',
 
     'zone'      =>  'GMT +3',
 

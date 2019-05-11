@@ -7,8 +7,7 @@ return [
     'categories_sales'      => 'Ventas',
     'currencies_usd'        => 'Dólar EEUU',
     'currencies_eur'        => 'Euro',
-    'currencies_cop'        => 'Peso Colombiano',
-    'taxes_exempt'          => 'Exentos de impuestos',
-    'taxes_sales'           => 'Impuesto sobre Ventas',
+    'currencies_gbp'        => 'Libra esterlina',
+    'currencies_try'        => 'Libra turca',
 
 ];
