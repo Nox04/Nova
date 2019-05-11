@@ -4,9 +4,6 @@
             <thead>
                 <tr>
                     <th class="col-sm-2">&nbsp;</th>
-                    @foreach($dates as $date)
-                        <th class="col-sm-2 text-right">{{ trans('reports.quarter.' . $date) }}</th>
-                    @endforeach
                     <th class="col-sm-2 text-right">{{ trans_choice('general.totals', 1) }}</th>
                 </tr>
             </thead>
@@ -67,7 +64,7 @@
             <tbody>
                 <tr>
                     <th class="col-sm-2" colspan="6">{{ trans('reports.net_profit') }}</th>
-                    @foreach($totals as $total)
+                    @foreach($totals as $key => $total)
                         <th class="col-sm-2 text-right"><span>@money($total['amount'], $total['currency_code'], true)</span></th>
                     @endforeach
                 </tr>

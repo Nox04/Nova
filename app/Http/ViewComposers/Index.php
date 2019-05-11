@@ -20,6 +20,7 @@ class Index
         $now = Date::now();
 
         $this_year = $now->year;
+        $this_day =  $now->month. '-' .$now->day. '-' .$now->year;
 
         $years = [];
         $y = $now->addYears(2);
@@ -28,6 +29,6 @@ class Index
             $y->subYear();
         }
 
-        $view->with(['limits' => $limits, 'this_year' => $this_year, 'years' => $years]);
+        $view->with(['limits' => $limits, 'this_year' => $this_year, 'this_day' => $this_day, 'years' => $years]);
     }
 }

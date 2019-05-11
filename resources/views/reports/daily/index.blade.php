@@ -3,7 +3,7 @@
 @section('title', trans('reports.summary.daily'))
 
 @section('new_button')
-<span class="new-button"><a href="{{ url('reports/daily') }}?print=1&status={{ request('status') }}&year={{ request('year', $this_year) }}" target="_blank" class="btn btn-success btn-sm"><span class="fa fa-print"></span> &nbsp;{{ trans('general.print') }}</a></span>
+<span class="new-button"><a href="{{ url('reports/daily') }}?print=1&day={{ request('day', $this_day) }}" target="_blank" class="btn btn-success btn-sm"><span class="fa fa-print"></span> &nbsp;{{ trans('general.print') }}</a></span>
 @endsection
 
 @section('content')
@@ -12,7 +12,6 @@
     <div class="box-header with-border">
         {!! Form::open(['url' => 'reports/daily', 'role' => 'form', 'method' => 'GET']) !!}
         <div id="items" class="pull-left" style="margin-left: 5px">
-            {!! Form::date('day', trans('reports.day_date'), 'calendar', []) !!}
             <input class="datepicker" name="day" />
             {!! Form::button('<span class="fa fa-filter"></span> &nbsp;' . trans('general.filter'), ['type' => 'submit', 'class' => 'btn btn-sm btn-default btn-filter']) !!}
         </div>
@@ -38,7 +37,12 @@
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function(){
-        $('.datepicker').datepicker();
+        $.fn.datepicker.dates['en'] = {days:["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],daysShort:["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"],daysMin:["Do","Lu","Ma","Mi","Ju","Vi","Sa"],months:["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],monthsShort:["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],today:"Hoy",monthsTitle:"Meses",clear:"Borrar",weekStart:1,format:"dd/mm/yyyy"};
+        $('.datepicker').datepicker({
+            format: 'mm-dd-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        }).datepicker("setDate","{{ request('day', $this_day) }}");;
     });
 </script>
 @endpush

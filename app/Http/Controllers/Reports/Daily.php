@@ -27,7 +27,6 @@ class Daily extends Controller
     {
         $dates = $totals = $compares = $categories = [];
 
-        $status = request('status');
         $year = request('year', Date::now()->year);
         
         // check and assign year start
@@ -118,54 +117,20 @@ class Daily extends Controller
         }
 
         // Invoices
-        switch ($status) {
-            case 'paid':
-                $invoices = InvoicePayment::monthsOfYear('paid_at')->get();
-                $this->setAmount($totals, $compares, $invoices, 'invoice', 'paid_at');
-                break;
-            case 'upcoming':
-                $invoices = Invoice::accrued()->monthsOfYear('due_at')->get();
-                $this->setAmount($totals, $compares, $invoices, 'invoice', 'due_at');
-                break;
-            default:
-                $invoices = Invoice::accrued()->monthsOfYear('invoiced_at')->get();
-                $this->setAmount($totals, $compares, $invoices, 'invoice', 'invoiced_at');
-                break;
-        }
+        $invoices = InvoicePayment::monthsOfYear('paid_at')->get();
+        $this->setAmount($totals, $compares, $invoices, 'invoice', 'paid_at');
 
         // Revenues
-        if ($status != 'upcoming') {
-            $revenues = Revenue::monthsOfYear('paid_at')->isNotTransfer()->get();
-            $this->setAmount($totals, $compares, $revenues, 'revenue', 'paid_at');
-        }
+        $revenues = Revenue::monthsOfYear('paid_at')->isNotTransfer()->get();
+        $this->setAmount($totals, $compares, $revenues, 'revenue', 'paid_at');
 
         // Bills
-        switch ($status) {
-            case 'paid':
-                $bills = BillPayment::monthsOfYear('paid_at')->get();
-                $this->setAmount($totals, $compares, $bills, 'bill', 'paid_at');
-                break;
-            case 'upcoming':
-                $bills = Bill::accrued()->monthsOfYear('due_at')->get();
-                $this->setAmount($totals, $compares, $bills, 'bill', 'due_at');
-                break;
-            default:
-                $bills = Bill::accrued()->monthsOfYear('billed_at')->get();
-                $this->setAmount($totals, $compares, $bills, 'bill', 'billed_at');
-                break;
-        }
+        $bills = BillPayment::monthsOfYear('paid_at')->get();
+        $this->setAmount($totals, $compares, $bills, 'bill', 'paid_at');
         
         // Payments
-        if ($status != 'upcoming') {
-            $payments = Payment::monthsOfYear('paid_at')->isNotTransfer()->get();
-            $this->setAmount($totals, $compares, $payments, 'payment', 'paid_at');
-        }
-
-        $statuses = collect([
-            'all' => trans('general.all'),
-            'paid' => trans('invoices.paid'),
-            'upcoming' => trans('general.upcoming'),
-        ]);
+        $payments = Payment::monthsOfYear('paid_at')->isNotTransfer()->get();
+        $this->setAmount($totals, $compares, $payments, 'payment', 'paid_at');
 
         // Check if it's a print or normal request
         if (request('print')) {
@@ -174,7 +139,7 @@ class Daily extends Controller
             $view_template = 'reports.daily.index';
         }
 
-        return view($view_template, compact('dates', 'income_categories', 'expense_categories', 'compares', 'totals', 'gross', 'statuses'));
+        return view($view_template, compact('dates', 'income_categories', 'expense_categories', 'compares', 'totals', 'gross'));
     }
 
     private function setAmount(&$totals, &$compares, $items, $type, $date_field)
