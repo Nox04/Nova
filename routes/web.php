@@ -147,6 +147,7 @@ Route::group(['middleware' => 'language'], function () {
                 Route::resource('income-expense-summary', 'Reports\IncomeExpenseSummary');
                 Route::resource('tax-summary', 'Reports\TaxSummary');
                 Route::resource('profit-loss', 'Reports\ProfitLoss');
+                Route::resource('daily', 'Reports\Daily');
             });
 
             Route::group(['prefix' => 'settings'], function () {

@@ -121,6 +121,7 @@ class AdminMenu
                 'read-reports-income-expense-summary',
                 'read-reports-tax-summary',
                 'read-reports-profit-loss',
+                'read-reports-daily',
             ])) {
                 $menu->dropdown(trans_choice('general.reports', 2), function ($sub) use($user, $attr) {
                     if ($user->can('read-reports-income-summary')) {
@@ -141,6 +142,10 @@ class AdminMenu
 
                     if ($user->can('read-reports-profit-loss')) {
                         $sub->url('reports/profit-loss', trans('reports.profit_loss'), 5, $attr);
+                    }
+
+                    if ($user->can('read-reports-daily')) {
+                        $sub->url('reports/daily', trans('reports.summary.daily'), 6, $attr);
                     }
                 }, 6, [
                     'title' => trans_choice('general.reports', 2),
