@@ -43,7 +43,7 @@ return [
     'developers'            => 'Desarrollador | Desarrolladores',
 
     'dashboard'             => 'Panel de Control',
-    'banking'               => 'Bancos',
+    'banking'               => 'Cuentas',
     'general'               => 'General',
     'no_records'            => 'No hay registros.',
     'date'                  => 'Fecha',
