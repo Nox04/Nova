@@ -131,11 +131,17 @@ class Daily extends Controller
         if($invoices->count() > 0) {
             foreach ($invoices as $invoice) {
                 foreach($invoice->items as $item) {
+                    
                     if($item->item_id !== 0) {
                         if(array_key_exists($item->item_id,$items)) {
                             $items[$item->item_id]['quantity'] += $item->quantity;
+                            $items[$item->item_id]['price'] += $item->quantity * $item->price;
                         } else {
-                            $items[$item->item_id] = ['name' => $item->name, 'quantity' => $item->quantity];
+                            $items[$item->item_id] = [
+                                'name' => $item->name, 
+                                'quantity' => $item->quantity, 
+                                'price' => $item->quantity * $item->price
+                            ];
                         }
                     }
                 }
