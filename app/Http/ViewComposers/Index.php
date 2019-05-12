@@ -20,7 +20,7 @@ class Index
         $now = Date::now();
 
         $this_year = $now->year;
-        $this_day =  $now->month. '-' .$now->day. '-' .$now->year;
+        $this_day =  $now->day. '-' .$now->month. '-' .$now->year;
 
         $years = [];
         $y = $now->addYears(2);

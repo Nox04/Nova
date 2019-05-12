@@ -47,23 +47,12 @@ trait DateTime
 
     public function scopeToday($query, $field)
     {
+        
         $now = Date::now();
-        $day = request('day', $now->month. '-' .$now->day. '-' .$now->year);
+        $day = request('day', $now->day. '-' .$now->month. '-' .$now->year);
 
         $start = Date::parse($day)->startOfDay()->format('Y-m-d H:i:s');
-        $end = Date::parse($day)->endOfDay()->format('Y-m-d  H:i:s');
-        
-        // check if financial year has been customized
-        $financial_start = $this->getFinancialStart();
-
-        if (Date::now()->startOfYear()->format('Y-m-d') !== $financial_start->format('Y-m-d')) {
-            if (!is_null(request('year'))) {
-                $financial_start->year = $year;
-            }
-
-            $start = $financial_start->format('Y-m-d');
-            $end = $financial_start->addYear(1)->subDays(1)->format('Y-m-d');
-        }
+        $end = Date::parse($day)->endOfDay()->format('Y-m-d H:i:s');
 
         return $query->whereBetween($field, [$start, $end]);
     }

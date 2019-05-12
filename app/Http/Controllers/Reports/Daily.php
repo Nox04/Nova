@@ -28,8 +28,9 @@ class Daily extends Controller
         $dates = $totals = $categories = [];
 
         $now = Date::now();
-        $day = request('day', $now->month. '-' .$now->day. '-' .$now->year);
 
+        $day = request('day', $now->day. '-' .$now->month. '-' .$now->year);
+        
         $income_categories = Category::enabled()->type('income')->orderBy('name')->pluck('name', 'id')->toArray();
 
         $expense_categories = Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id')->toArray();
@@ -59,19 +60,19 @@ class Daily extends Controller
         ];
 
         // Invoices
-        $invoices = InvoicePayment::monthsOfYear('paid_at')->get();
+        $invoices = InvoicePayment::today('paid_at')->get();
         $this->setAmount($totals, $invoices, 'invoice', 'paid_at');
 
         // Revenues
-        $revenues = Revenue::monthsOfYear('paid_at')->isNotTransfer()->get();
+        $revenues = Revenue::today('paid_at')->isNotTransfer()->get();
         $this->setAmount($totals, $revenues, 'revenue', 'paid_at');
 
         // Bills
-        $bills = BillPayment::monthsOfYear('paid_at')->get();
+        $bills = BillPayment::today('paid_at')->get();
         $this->setAmount($totals, $bills, 'bill', 'paid_at');
         
         // Payments
-        $payments = Payment::monthsOfYear('paid_at')->isNotTransfer()->get();
+        $payments = Payment::today('paid_at')->isNotTransfer()->get();
         $this->setAmount($totals, $payments, 'payment', 'paid_at');
 
         // Check if it's a print or normal request
