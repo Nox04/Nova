@@ -393,7 +393,7 @@
 
                     @stack('button_share_start')
                     <a href="{{ $customer_share }}" target="_blank" class="btn btn-primary">
-                        <i class="fa fa-share"></i>&nbsp; Share
+                        <i class="fa fa-share"></i>&nbsp; Compartir
                     </a>
                     @stack('button_share_end')
 
