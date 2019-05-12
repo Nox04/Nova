@@ -61,4 +61,22 @@
             </tbody>
         </table>
     </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover" style="margin-top: 40px">
+            <thead>
+                <tr>
+                    <th class="col-sm-2" colspan="6">{{ trans_choice('general.items', 1) }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($items as $item)
+                    <tr>
+                        <td class="col-sm-2">{{ $item['name'] }}</td>
+                        <td class="col-sm-2 text-right">{{ $item['quantity'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>

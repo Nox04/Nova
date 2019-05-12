@@ -25,7 +25,7 @@ class Daily extends Controller
      */
     public function index()
     {
-        $dates = $totals = $categories = [];
+        $items = $totals = $categories = [];
 
         $now = Date::now();
 
@@ -60,13 +60,14 @@ class Daily extends Controller
         ];
 
         // Invoices
-        $invoices = InvoicePayment::today('paid_at')->get();
+        $invoices = InvoicePayment::today('paid_at')->with('invoice.items')->get();
         $this->setAmount($totals, $invoices, 'invoice', 'paid_at');
 
+        
         // Revenues
         $revenues = Revenue::today('paid_at')->isNotTransfer()->get();
         $this->setAmount($totals, $revenues, 'revenue', 'paid_at');
-
+        
         // Bills
         $bills = BillPayment::today('paid_at')->get();
         $this->setAmount($totals, $bills, 'bill', 'paid_at');
@@ -74,6 +75,9 @@ class Daily extends Controller
         // Payments
         $payments = Payment::today('paid_at')->isNotTransfer()->get();
         $this->setAmount($totals, $payments, 'payment', 'paid_at');
+        
+        $uniqueInvoices = Invoice::today('invoiced_at')->goOut()->with('items')->get();
+        $this->setItems($items, $uniqueInvoices);
 
         // Check if it's a print or normal request
         if (request('print')) {
@@ -82,7 +86,7 @@ class Daily extends Controller
             $view_template = 'reports.daily.index';
         }
 
-        return view($view_template, compact('totals'));
+        return view($view_template, compact('totals', 'items'));
     }
 
     private function setAmount(&$totals, $items, $type, $date_field)
@@ -118,6 +122,23 @@ class Daily extends Controller
                 $totals['expenses']['amount'] += $amount;
                 $totals['expense_categories'][$item->category_id]['amount'] += $amount;
                 $totals['total']['amount'] -= $amount;
+            }
+        }
+    }
+
+    private function setItems(&$items, $invoices)
+    {
+        if($invoices->count() > 0) {
+            foreach ($invoices as $invoice) {
+                foreach($invoice->items as $item) {
+                    if($item->item_id !== 0) {
+                        if(array_key_exists($item->item_id,$items)) {
+                            $items[$item->item_id]['quantity'] += $item->quantity;
+                        } else {
+                            $items[$item->item_id] = ['name' => $item->name, 'quantity' => $item->quantity];
+                        }
+                    }
+                }
             }
         }
     }

@@ -131,6 +131,11 @@ class Invoice extends Model
         return $query->where('invoice_status_code', '<>', 'draft');
     }
 
+    public function scopeGoOut($query)
+    {
+        return $query->where('invoice_status_code', '<>', 'draft')->where('invoice_status_code', '<>', 'delete');
+    }
+
     public function scopePaid($query)
     {
         return $query->where('invoice_status_code', '=', 'paid');
