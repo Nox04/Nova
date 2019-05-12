@@ -15,25 +15,21 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($compares['income'] as $category_id => $category)
+                @foreach($totals['income_categories'] as $category)
                     <tr>
-                        <td class="col-sm-2">{{ $income_categories[$category_id] }}</td>
-                        @foreach($category as $i => $item)
-                            @php $gross['income'][$i] += $item['amount']; @endphp
-                            <td class="col-sm-2 text-right">@money($item['amount'], setting('general.default_currency'), true)</td>
-                        @endforeach
+                        <td class="col-sm-2">{{ $category['name'] }}</td>
+                        <td class="col-sm-2 text-right">@money($category['amount'], setting('general.default_currency'), true)</td>
                     </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr>
                     <th class="col-sm-2">{{ trans('reports.gross_profit') }}</th>
-                    @foreach($gross['income'] as $item)
-                        <th class="col-sm-2 text-right">@money($item, setting('general.default_currency'), true)</th>
-                    @endforeach
+                    <th class="col-sm-2 text-right">@money($totals['incomes']['amount'], setting('general.default_currency'), true)</th>
                 </tr>
             </tfoot>
         </table>
+
         <table class="table table-hover" style="margin-top: 40px">
             <thead>
                 <tr>
@@ -41,32 +37,26 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($compares['expense'] as $category_id => $category)
+                @foreach($totals['expense_categories'] as $category)
                     <tr>
-                        <td class="col-sm-2">{{ $expense_categories[$category_id] }}</td>
-                        @foreach($category as $i => $item)
-                            @php $gross['expense'][$i] += $item['amount']; @endphp
-                            <td class="col-sm-2 text-right">@money($item['amount'], setting('general.default_currency'), true)</td>
-                        @endforeach
+                        <td class="col-sm-2">{{ $category['name'] }}</td>
+                        <td class="col-sm-2 text-right">@money($totals['expenses']['amount'], setting('general.default_currency'), true)</td>
                     </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr>
                     <th class="col-sm-2">{{ trans('reports.total_expenses') }}</th>
-                    @foreach($gross['expense'] as $item)
-                        <th class="col-sm-2 text-right">@money($item, setting('general.default_currency'), true)</th>
-                    @endforeach
+                    <th class="col-sm-2 text-right">@money($totals['expenses']['amount'], setting('general.default_currency'), true)</th>
                 </tr>
             </tfoot>
         </table>
+
         <table class="table" style="margin-top: 40px">
             <tbody>
                 <tr>
                     <th class="col-sm-2" colspan="6">{{ trans('reports.net_profit') }}</th>
-                    @foreach($totals as $key => $total)
-                        <th class="col-sm-2 text-right"><span>@money($total['amount'], $total['currency_code'], true)</span></th>
-                    @endforeach
+                    <th class="col-sm-2 text-right"><span>@money($totals['total']['amount'], $totals['total']['currency_code'], true)</span></th>
                 </tr>
             </tbody>
         </table>

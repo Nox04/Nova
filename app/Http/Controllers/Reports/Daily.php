@@ -25,112 +25,54 @@ class Daily extends Controller
      */
     public function index()
     {
-        $dates = $totals = $compares = $categories = [];
+        $dates = $totals = $categories = [];
 
-        $year = request('year', Date::now()->year);
-        
-        // check and assign year start
-        $financial_start = $this->getFinancialStart();
-
-        if ($financial_start->month != 1) {
-            // check if a specific year is requested
-            if (!is_null(request('year'))) {
-                $financial_start->year = $year;
-            }
-
-            $year = [$financial_start->format('Y'), $financial_start->addYear()->format('Y')];
-            $financial_start->subYear()->subQuarter();
-        }
+        $now = Date::now();
+        $day = request('day', $now->month. '-' .$now->day. '-' .$now->year);
 
         $income_categories = Category::enabled()->type('income')->orderBy('name')->pluck('name', 'id')->toArray();
 
         $expense_categories = Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id')->toArray();
 
-        // Dates
-        for ($j = 1; $j <= 12; $j++) {
-            $ym_string = is_array($year) ? $financial_start->addQuarter()->format('Y-m') : $year . '-' . $j;
-            
-            $dates[$j] = Date::parse($ym_string)->quarter;
-
-            // Totals
-            $totals[$dates[$j]] = array(
+        foreach($income_categories as $key => $income) {
+            $totals['income_categories'][$key] = [
+                'name' => $income,
                 'amount' => 0,
                 'currency_code' => setting('general.default_currency'),
                 'currency_rate' => 1
-            );
-
-            foreach ($income_categories as $category_id => $category_name) {
-                $compares['income'][$category_id][$dates[$j]] = [
-                    'category_id' => $category_id,
-                    'name' => $category_name,
-                    'amount' => 0,
-                    'currency_code' => setting('general.default_currency'),
-                    'currency_rate' => 1
-                ];
-            }
-
-            foreach ($expense_categories as $category_id => $category_name) {
-                $compares['expense'][$category_id][$dates[$j]] = [
-                    'category_id' => $category_id,
-                    'name' => $category_name,
-                    'amount' => 0,
-                    'currency_code' => setting('general.default_currency'),
-                    'currency_rate' => 1
-                ];
-            }
-
-            $j += 2;
+            ];
         }
 
-        $totals['total'] = [
+        foreach($expense_categories as $key => $expense) {
+            $totals['expense_categories'][$key] = [
+                'name' => $expense,
+                'amount' => 0,
+                'currency_code' => setting('general.default_currency'),
+                'currency_rate' => 1
+            ];
+        }
+
+        $totals['total'] = $totals['incomes'] = $totals['expenses'] = [
             'amount' => 0,
             'currency_code' => setting('general.default_currency'),
             'currency_rate' => 1
         ];
 
-        foreach ($dates as $date) {
-            $gross['income'][$date] = 0;
-            $gross['expense'][$date] = 0;
-        }
-
-        $gross['income']['total'] = 0;
-        $gross['expense']['total'] = 0;
-
-        foreach ($income_categories as $category_id => $category_name) {
-            $compares['income'][$category_id]['total'] = [
-                'category_id' => $category_id,
-                'name' => trans_choice('general.totals', 1),
-                'amount' => 0,
-                'currency_code' => setting('general.default_currency'),
-                'currency_rate' => 1
-            ];
-        }
-
-        foreach ($expense_categories as $category_id => $category_name) {
-            $compares['expense'][$category_id]['total'] = [
-                'category_id' => $category_id,
-                'name' => trans_choice('general.totals', 1),
-                'amount' => 0,
-                'currency_code' => setting('general.default_currency'),
-                'currency_rate' => 1
-            ];
-        }
-
         // Invoices
         $invoices = InvoicePayment::monthsOfYear('paid_at')->get();
-        $this->setAmount($totals, $compares, $invoices, 'invoice', 'paid_at');
+        $this->setAmount($totals, $invoices, 'invoice', 'paid_at');
 
         // Revenues
         $revenues = Revenue::monthsOfYear('paid_at')->isNotTransfer()->get();
-        $this->setAmount($totals, $compares, $revenues, 'revenue', 'paid_at');
+        $this->setAmount($totals, $revenues, 'revenue', 'paid_at');
 
         // Bills
         $bills = BillPayment::monthsOfYear('paid_at')->get();
-        $this->setAmount($totals, $compares, $bills, 'bill', 'paid_at');
+        $this->setAmount($totals, $bills, 'bill', 'paid_at');
         
         // Payments
         $payments = Payment::monthsOfYear('paid_at')->isNotTransfer()->get();
-        $this->setAmount($totals, $compares, $payments, 'payment', 'paid_at');
+        $this->setAmount($totals, $payments, 'payment', 'paid_at');
 
         // Check if it's a print or normal request
         if (request('print')) {
@@ -139,10 +81,10 @@ class Daily extends Controller
             $view_template = 'reports.daily.index';
         }
 
-        return view($view_template, compact('dates', 'income_categories', 'expense_categories', 'compares', 'totals', 'gross'));
+        return view($view_template, compact('totals'));
     }
 
-    private function setAmount(&$totals, &$compares, $items, $type, $date_field)
+    private function setAmount(&$totals, $items, $type, $date_field)
     {
         foreach ($items as $item) {
             if (($item->getTable() == 'bill_payments') || ($item->getTable() == 'invoice_payments')) {
@@ -151,15 +93,14 @@ class Daily extends Controller
                 $item->category_id = $type_item->category_id;
             }
 
-            $date = Date::parse($item->$date_field)->quarter;
+            $now = Date::parse($item->$date_field);
+            
+            $date = $now->month. '-' .$now->day. '-' .$now->year;
 
             $group = (($type == 'invoice') || ($type == 'revenue')) ? 'income' : 'expense';
 
-            if (!isset($compares[$group][$item->category_id])) {
-                continue;
-            }
-
             $amount = $item->getConvertedAmount(false, false);
+
 
             // Forecasting
             if ((($type == 'invoice') || ($type == 'bill')) && ($date_field == 'due_at')) {
@@ -168,16 +109,13 @@ class Daily extends Controller
                 }
             }
 
-            $compares[$group][$item->category_id][$date]['amount'] += $amount;
-            $compares[$group][$item->category_id][$date]['currency_code'] = $item->currency_code;
-            $compares[$group][$item->category_id][$date]['currency_rate'] = $item->currency_rate;
-            $compares[$group][$item->category_id]['total']['amount'] += $amount;
-
             if ($group == 'income') {
-                $totals[$date]['amount'] += $amount;
+                $totals['incomes']['amount'] += $amount;
+                $totals['income_categories'][$item->category_id]['amount'] += $amount;
                 $totals['total']['amount'] += $amount;
             } else {
-                $totals[$date]['amount'] -= $amount;
+                $totals['expenses']['amount'] += $amount;
+                $totals['expense_categories'][$item->category_id]['amount'] += $amount;
                 $totals['total']['amount'] -= $amount;
             }
         }

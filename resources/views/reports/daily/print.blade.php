@@ -8,8 +8,8 @@
         <div class="text-muted">
             {{ setting('general.company_name') }}
             <br/>
-            {{ Date::parse(request('year') . '-1-1')->format($date_format) }} - {{ Date::parse(request('year') . '-12-31')->format($date_format) }}
+            {{ Date::parse(request('year') . '-1-1')->format($date_format) }}
         </div>
     </div>
-    @include('reports.profit_loss.body')
+    @include('reports.daily.body')
 @endsection
