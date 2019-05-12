@@ -2,20 +2,20 @@
 
 return [
 
-    'title'   => 'Offline Payments',
+    'title'   => 'Métodos de pago',
 
-    'add_new' => 'Add New',
-    'edit' => 'Edit: :method',
+    'add_new' => 'Añadir nuevo',
+    'edit' => 'Editar: :method',
 
     'form' => [
-        'code' => 'Code',
-        'customer' => 'Show to Customer',
-        'order' => 'Order'
+        'code' => 'Código',
+        'customer' => 'Mostrar al usuario',
+        'order' => 'Posición'
     ],
 
-    'payment_gateways' => 'Offline Payment Methods',
+    'payment_gateways' => 'Métodos de pago',
 
-    'confirm' => 'Confirm',
-    'loading' => 'Loading',
+    'confirm' => 'Confirmar',
+    'loading' => 'Cargando',
 
 ];

@@ -104,10 +104,7 @@ class AdminMenu
                     if ($user->can('read-banking-transactions')) {
                         $sub->url('banking/transactions', trans_choice('general.transactions', 2), 3, $attr);
                     }
-
-                    if ($user->can('read-banking-reconciliations')) {
-                        $sub->url('banking/reconciliations', trans_choice('general.reconciliations', 2), 4, $attr);
-                    }
+                    
                 }, 5, [
                     'title' => trans('general.banking'),
                     'icon' => 'fa fa-university',
