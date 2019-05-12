@@ -183,19 +183,8 @@
         var focus = false;
         var item_row = '{{ $item_row }}';
         var autocomplete_path = "{{ url('common/items/autocomplete') }}";
-        var items = [];
 
         $(document).ready(function() {
-            $.ajax({
-                url: autocomplete_path,
-                type: 'GET',
-                dataType: 'JSON',
-                data: 'query=&type=invoice&currency_code=' + $('#currency_code').val(),
-                success: function(data) {
-                    items = data;
-                }
-            });
-
             itemTableResize();
 
             @if (old('item'))
@@ -345,33 +334,33 @@
 
                         $('#item-price-' + item_row).trigger('focusout');
 
-                        $('#item-name-' + item_row).focus();
-                        $('#item-name-' + item_row).trigger('click');
-
                         item_row++;
                     }
                 }
             });
         });
 
-        $(document).on('focusout', '.form-control.typeahead', function() {
-            if($(this).val() === '') {
-                var id = $(this).attr('id').replace("name", "row");;
-                $('#' + id + ' button').trigger('click');
-            }
-        });
-        
         $(document).on('click', '.form-control.typeahead', function() {
             input_id = $(this).attr('id').split('-');
 
             item_id = parseInt(input_id[input_id.length-1]);
 
             $(this).typeahead({
-                minLength: 0,
+                minLength: 3,
                 displayText:function (data) {
                     return data.name + ' (' + data.sku + ')';
                 },
-                source: items,
+                source: function (query, process) {
+                    $.ajax({
+                        url: autocomplete_path,
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: 'query=' + query + '&type=invoice&currency_code=' + $('#currency_code').val(),
+                        success: function(data) {
+                            return process(data);
+                        }
+                    });
+                },
                 afterSelect: function (data) {
                     $('#item-id-' + item_id).val(data.item_id);
                     $('#item-quantity-' + item_id).val('1');
@@ -385,7 +374,6 @@
                     $('#item-total-' + item_id).html(data.total);
 
                     totalItem();
-                    $('#button-add-item').trigger('click');
                 }
             });
         });
