@@ -335,7 +335,7 @@
                                     @if ($bill->paid)
                                         <tr class="text-success">
                                             <th>{{ trans('invoices.paid') }}:</th>
-                                            <td class="text-right">- @money($bill->paid, $bill->currency_code, true)</td>
+                                            <td class="text-right"> @money($bill->paid, $bill->currency_code, true)</td>
                                         </tr>
                                     @endif
                                     @stack('grand_total_td_start')
