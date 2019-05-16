@@ -2,7 +2,7 @@
 
 return [
 
-    'name'      =>  'Nova',
+    'name'      =>  'Irene Digital',
 
     'code'      =>  'Reconciliation',
 
