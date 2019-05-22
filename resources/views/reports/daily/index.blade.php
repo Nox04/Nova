@@ -12,8 +12,8 @@
     <div class="box-header with-border">
         {!! Form::open(['url' => 'reports/daily', 'role' => 'form', 'method' => 'GET']) !!}
         <div id="items" class="pull-left" style="margin-left: 5px">
-            <input id="star_field" class="datepicker" name="start" />
-            <input id="end_field" class="datepicker" name="end" />
+            Desde <input id="star_field" class="datepicker form-control input-filter input-sm" name="start" />
+            Hasta <input id="end_field" class="datepicker form-control input-filter input-sm" name="end" />
             {!! Form::button('<span class="fa fa-filter"></span> &nbsp;' . trans('general.filter'), ['type' => 'submit', 'class' => 'btn btn-sm btn-default btn-filter']) !!}
         </div>
         {!! Form::close() !!}
