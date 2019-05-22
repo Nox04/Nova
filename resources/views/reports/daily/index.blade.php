@@ -12,7 +12,8 @@
     <div class="box-header with-border">
         {!! Form::open(['url' => 'reports/daily', 'role' => 'form', 'method' => 'GET']) !!}
         <div id="items" class="pull-left" style="margin-left: 5px">
-            <input class="datepicker" name="day" />
+            <input id="star_field" class="datepicker" name="start" />
+            <input id="end_field" class="datepicker" name="end" />
             {!! Form::button('<span class="fa fa-filter"></span> &nbsp;' . trans('general.filter'), ['type' => 'submit', 'class' => 'btn btn-sm btn-default btn-filter']) !!}
         </div>
         {!! Form::close() !!}
@@ -38,11 +39,16 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $.fn.datepicker.dates['en'] = {days:["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],daysShort:["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"],daysMin:["Do","Lu","Ma","Mi","Ju","Vi","Sa"],months:["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],monthsShort:["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],today:"Hoy",monthsTitle:"Meses",clear:"Borrar",weekStart:1,format:"dd/mm/yyyy"};
-        $('.datepicker').datepicker({
+        $('#star_field').datepicker({
             format: 'dd-mm-yyyy',
             autoclose: true,
             todayHighlight: true
-        }).datepicker("setDate","{{ request('day', $this_day) }}");;
+        }).datepicker("setDate","{{ request('start', $this_day) }}");
+        $('#end_field').datepicker({
+            format: 'dd-mm-yyyy',
+            autoclose: true,
+            todayHighlight: true
+        }).datepicker("setDate","{{ request('end', $this_day) }}");
     });
 </script>
 @endpush

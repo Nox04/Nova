@@ -57,6 +57,19 @@ trait DateTime
         return $query->whereBetween($field, [$start, $end]);
     }
 
+    public function scopeBetween($query, $field)
+    {
+        
+        $now = Date::now();
+        $startDate = request('start', $now->day. '-' .$now->month. '-' .$now->year);
+        $endDate = request('end', $now->day. '-' .$now->month. '-' .$now->year);
+
+        $start = Date::parse($startDate)->startOfDay()->format('Y-m-d H:i:s');
+        $end = Date::parse($endDate)->endOfDay()->format('Y-m-d H:i:s');
+
+        return $query->whereBetween($field, [$start, $end]);
+    }
+
     public function getTimezones()
     {
         // The list of available timezone groups to use.

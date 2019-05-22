@@ -60,23 +60,23 @@ class Daily extends Controller
         ];
 
         // Invoices
-        $invoices = InvoicePayment::today('paid_at')->with('invoice.items')->get();
+        $invoices = InvoicePayment::between('paid_at')->with('invoice.items')->get();
         $this->setAmount($totals, $invoices, 'invoice', 'paid_at');
 
         
         // Revenues
-        $revenues = Revenue::today('paid_at')->isNotTransfer()->get();
+        $revenues = Revenue::between('paid_at')->isNotTransfer()->get();
         $this->setAmount($totals, $revenues, 'revenue', 'paid_at');
         
         // Bills
-        $bills = BillPayment::today('paid_at')->get();
+        $bills = BillPayment::between('paid_at')->get();
         $this->setAmount($totals, $bills, 'bill', 'paid_at');
         
         // Payments
-        $payments = Payment::today('paid_at')->isNotTransfer()->get();
+        $payments = Payment::between('paid_at')->isNotTransfer()->get();
         $this->setAmount($totals, $payments, 'payment', 'paid_at');
         
-        $uniqueInvoices = Invoice::today('invoiced_at')->goOut()->with('items')->get();
+        $uniqueInvoices = Invoice::between('invoiced_at')->goOut()->with('items')->get();
         $this->setItems($items, $uniqueInvoices);
 
         // Check if it's a print or normal request
