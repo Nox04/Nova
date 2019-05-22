@@ -13,9 +13,9 @@
         prefix: "",
         suffix: "",
         affixesStay: true,
-        thousands: ",",
-        decimal: ".",
-        precision: 2,
+        thousands: ".",
+        decimal: ",",
+        precision: 0,
         allowZero: false,
         allowNegative: false,
         doubleClickSelection: true,
@@ -67,8 +67,9 @@
                 });
 
                 value = value.replace(/\D/g, "");
-                value = value.replace(new RegExp(decimalPart + "$"), "." + decimalPart);
-
+                console.log('orig' + value);
+                //value = value.replace(new RegExp(decimalPart + "$"), "," + decimalPart);
+                console.log('edit' + value);
                 if (isNegative) {
                     value = "-" + value;
                 }
@@ -214,13 +215,12 @@
 
                 function mask() {
                     var value = $input.val();
-
                     if (settings.allowEmpty && value === "") {
                         return;
                     }
 
                     var isNumber = !isNaN(value);
-                    var decimalPointIndex = isNumber ? value.indexOf(".") : value.indexOf(settings.decimal);
+                    var decimalPointIndex = isNumber ? value.indexOf(",") : value.indexOf(settings.decimal);
 
                     if (settings.precision > 0) {
                         if (decimalPointIndex < 0) {
@@ -642,8 +642,8 @@
         newValue = buildIntegerPart(integerPart, negative, settings);
 
         if (settings.precision > 0) {
-            if(!isNaN(value) && value.indexOf(".")){
-                var precision = value.substr(value.indexOf(".") + 1);
+            if(!isNaN(value) && value.indexOf(",")){
+                var precision = value.substr(value.indexOf(",") + 1);
 
                 onlyNumbers += new Array((settings.precision + 1) - precision.length).join(0);
 
@@ -684,11 +684,11 @@
 
             newValue += settings.decimal + decimalPart;
 
-            var rounded = Number.parseFloat((integerPart + "." + decimalPart)).toFixed(settings.precision);
+            var rounded = Number.parseFloat((integerPart + "," + decimalPart)).toFixed(settings.precision);
 
             var roundedDecimalPart = rounded.toString().split(settings.decimal)[1];
 
-            newValue = newValue.split(settings.decimal)[0] + "." + roundedDecimalPart;
+            newValue = newValue.split(settings.decimal)[0] + "," + roundedDecimalPart;
         }
 
         return setSymbol(newValue, settings);

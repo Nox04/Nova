@@ -475,7 +475,6 @@
                         });
 
                         $(this).val(amount);
-
                         $(this).trigger('focusout');
                     });
 
@@ -569,7 +568,6 @@
                                 prefix : (data.symbol_first) ? data.symbol : '',
                                 suffix : (data.symbol_first) ? '' : data.symbol
                             });
-
                             $(this).val(amount);
 
                             $(this).trigger('focusout');
