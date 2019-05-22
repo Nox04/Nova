@@ -118,6 +118,30 @@ class Invoices extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     *
+     * @return Response
+     */
+    public function createExtended()
+    {
+        $customers = Customer::enabled()->orderBy('name')->pluck('name', 'id');
+
+        $currencies = Currency::enabled()->orderBy('name')->pluck('name', 'code');
+
+        $currency = Currency::where('code', '=', setting('general.default_currency'))->first();
+
+        $items = Item::enabled()->orderBy('name')->pluck('name', 'id');
+
+        $taxes = Tax::enabled()->orderBy('name')->get()->pluck('title', 'id');
+
+        $categories = Category::enabled()->type('income')->orderBy('name')->pluck('name', 'id');
+
+        $number = $this->getNextInvoiceNumber();
+
+        return view('incomes.invoices.create_extended', compact('customers', 'currencies', 'currency', 'items', 'taxes', 'categories', 'number'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  Request  $request

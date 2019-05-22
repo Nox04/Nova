@@ -119,6 +119,7 @@ return [
     'end'                   => 'Fin',
     'clear'                 => 'Limpiar',
     'difference'            => 'Diferencia',
+    'invoices_extended'     => 'Facturas extendidas',
 
     'title' => [
         'new'               => 'Nuevo :type',

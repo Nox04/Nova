@@ -57,12 +57,16 @@ class AdminMenu
                         $sub->url('incomes/invoices', trans_choice('general.invoices', 2), 1, $attr);
                     }
 
+                    if ($user->can('read-incomes-invoices')) {
+                        $sub->url('incomes/invoices-extended', trans_choice('general.invoices_extended', 2), 2, $attr);
+                    }
+
                     if ($user->can('read-incomes-revenues')) {
-                        $sub->url('incomes/revenues', trans_choice('general.revenues', 2), 2, $attr);
+                        $sub->url('incomes/revenues', trans_choice('general.revenues', 2), 3, $attr);
                     }
 
                     if ($user->can('read-incomes-customers')) {
-                        $sub->url('incomes/customers', trans_choice('general.customers', 2), 3, $attr);
+                        $sub->url('incomes/customers', trans_choice('general.customers', 2), 4, $attr);
                     }
                 }, 3, [
                     'title' => trans_choice('general.incomes', 2),

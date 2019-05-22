@@ -89,6 +89,7 @@ Route::group(['middleware' => 'language'], function () {
                 Route::post('invoices/import', 'Incomes\Invoices@import')->name('invoices.import');
                 Route::get('invoices/export', 'Incomes\Invoices@export')->name('invoices.export');
                 Route::resource('invoices', 'Incomes\Invoices', ['middleware' => ['dateformat', 'money']]);
+                Route::get('invoices-extended', 'Incomes\Invoices@createExtended');
                 Route::get('revenues/{revenue}/duplicate', 'Incomes\Revenues@duplicate');
                 Route::post('revenues/import', 'Incomes\Revenues@import')->name('revenues.import');
                 Route::get('revenues/export', 'Incomes\Revenues@export')->name('revenues.export');
