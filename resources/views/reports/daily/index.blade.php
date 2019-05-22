@@ -3,7 +3,15 @@
 @section('title', trans('reports.summary.daily'))
 
 @section('new_button')
-<span class="new-button"><a href="{{ url('reports/daily') }}?print=1&day={{ request('day', $this_day) }}" target="_blank" class="btn btn-success btn-sm"><span class="fa fa-print"></span> &nbsp;{{ trans('general.print') }}</a></span>
+<span class="new-button">
+    <a 
+    href="{{ url('reports/daily') }}?print=1&start={{ request('start', $this_day) }}&end={{ request('end', $this_day) }}" 
+    target="_blank" 
+    class="btn btn-success btn-sm"
+    >
+        <span class="fa fa-print"></span> &nbsp;{{ trans('general.print') }}
+    </a>
+</span>
 @endsection
 
 @section('content')
