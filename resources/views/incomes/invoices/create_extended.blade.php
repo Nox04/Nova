@@ -53,10 +53,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php $item_row = 0; @endphp
-                        @php while($item_row < 3) { @endphp
+                        @foreach($items as $item_row => $item)
                             @include('incomes.invoices.item_extended')
-                        @php $item_row++;} @endphp
+                        @endforeach
                         @stack('sub_total_td_start')
                         <tr id="tr-subtotal">
                             <td class="text-right" colspan="5"><strong>{{ trans('invoices.sub_total') }}</strong></td>

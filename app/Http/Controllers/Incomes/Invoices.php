@@ -130,7 +130,7 @@ class Invoices extends Controller
 
         $currency = Currency::where('code', '=', setting('general.default_currency'))->first();
 
-        $items = Item::enabled()->orderBy('name')->pluck('name', 'id');
+        $items = Item::enabled()->orderBy('name')->get();
 
         $taxes = Tax::enabled()->orderBy('name')->get()->pluck('title', 'id');
 

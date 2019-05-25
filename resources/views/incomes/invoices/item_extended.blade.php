@@ -2,8 +2,8 @@
     @stack('name_td_start')
     <td {!! $errors->has('item.' . $item_row . '.name') ? 'class="has-error"' : ''  !!}>
         @stack('name_input_start')
-        <input value="{{ empty($item) ? '' : $item->name }}" class="form-control typeahead" required="required" placeholder="{{ trans('general.form.enter', ['field' => trans_choice('invoices.item_name', 1)]) }}" name="item[{{ $item_row }}][name]" type="text" id="item-name-{{ $item_row }}" autocomplete="off">
-        <input value="{{ empty($item) ? '' : $item->item_id }}" name="item[{{ $item_row }}][item_id]" type="hidden" id="item-id-{{ $item_row }}">
+        <input value="{{ empty($item) ? '' : $item->name }}" readonly class="form-control typeahead" required="required" placeholder="{{ trans('general.form.enter', ['field' => trans_choice('invoices.item_name', 1)]) }}" name="item[{{ $item_row }}][name]" type="text" id="item-name-{{ $item_row }}" autocomplete="off">
+        <input value="{{ empty($item) ? '' : $item_row }}" name="item[{{ $item_row }}][item_id]" type="hidden" id="item-id-{{ $item_row }}">
         {!! $errors->first('item.' . $item_row . '.name', '<p class="help-block">:message</p>') !!}
         @stack('name_input_end')
     </td>
@@ -11,7 +11,7 @@
     @stack('quantity_td_start')
     <td {{ $errors->has('item.' . $item_row . '.quantity') ? 'class="has-error"' : '' }}>
         @stack('quantity_input_start')
-        <input value="{{ empty($item) ? 0 : $item->quantity }}" class="form-control text-center" required="required" name="item[{{ $item_row }}][quantity]" type="text" id="item-quantity-{{ $item_row }}">
+        <input value="{{ empty($item) ? 0 : 0 }}" class="form-control text-center" required="required" name="item[{{ $item_row }}][quantity]" type="text" id="item-quantity-{{ $item_row }}">
         {!! $errors->first('item.' . $item_row . '.quantity', '<p class="help-block">:message</p>') !!}
         @stack('quantity_input_end')
     </td>
@@ -19,7 +19,7 @@
     @stack('price_td_start')
     <td {{ $errors->has('item.' . $item_row . 'price') ? 'class="has-error"' : '' }}>
         @stack('price_input_start')
-        <input value="{{ empty($item) ? '' : $item->price }}" class="form-control text-right input-price" required="required" name="item[{{ $item_row }}][price]" type="text" id="item-price-{{ $item_row }}">
+        <input value="{{ empty($item) ? '' : $item->sale_price }}" class="form-control text-right input-price" required="required" name="item[{{ $item_row }}][price]" type="text" id="item-price-{{ $item_row }}">
         <input value="{{ $currency->code }}" name="item[{{ $item_row }}][currency]" type="hidden" id="item-currency-{{ $item_row }}">
         {!! $errors->first('item.' . $item_row . 'price', '<p class="help-block">:message</p>') !!}
         @stack('price_input_end')
